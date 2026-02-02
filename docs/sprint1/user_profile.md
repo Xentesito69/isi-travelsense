@@ -1,5 +1,6 @@
 👤 Perfil del cliente 
 
+
 Turistas urbanos que quieren organizar un viaje rápido y bien optimizado. 
 
 Personas activas (deporte: tenis/esquí/senderismo) que planifican según condiciones. 
