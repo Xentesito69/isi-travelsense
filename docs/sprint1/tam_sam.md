@@ -1,4 +1,4 @@
-📊 TAM & SAM (simple y defendible) 
+📊 TAM & SAM
 
 - TAM (Total Addressable Market): personas que viajan por ocio (turismo urbano y escapadas) a nivel nacional/internacional.  
 
