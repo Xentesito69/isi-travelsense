@@ -1,18 +1,33 @@
-# TravelSense
+## TravelSense - Context-Aware Travel Support System
 
-TravelSense es un sistema de soporte a la decisión para la planificación de viajes basado en contexto, que integra fuentes de datos externas
-(clima, mapas y lugares) para generar planes diarios personalizados centrados en ocio, deporte y gastronomía.
+## 🚀 Proyecto ISI 2025-2026 (Sprint 1)
+Sistema inteligente de planificación de viajes que integra datos externos (clima, mapas y lugares) para recomendar experiencias personalizadas y generar un plan diario optimizado.
 
-## Alcance del proyecto
-- Aplicación web (MVP)
-- Integración de APIs externas
-- Sistema de recomendación basado en contexto
-- Planificación diaria de viajes y optimización de rutas
+### 👥 Equipo y Roles
+* **Mariam** - Frontend / UX (Interfaz, mapa, filtros, prototipo GUI).
+* **Noelia** - Backend / Integración (APIs, lógica de scoring, persistencia BD).
+* **Vicente** - Testing / DevOps (CI, mocks, automatización de despliegue).
 
-## Equipo
-- Frontend / UX
-- Backend / Integración
-- Testing / DevOps
+---
 
-## Asignatura
-Integración de Sistemas Informáticos
+### 💡 Motivación y Objetivos
+TravelSense nace para evitar la pérdida de tiempo al consultar múltiples fuentes (clima, mapas, ocio) antes de un viaje. Nuestro objetivo es desarrollar un **MVP** capaz de generar itinerarios basados en:
+1. **Contexto:** Meteorología en tiempo real.
+2. **Ubicación:** Distancia óptima entre puntos.
+3. **Preferencias:** Ocio, deporte y gastronomía.
+
+### 📊 Estado del Proyecto (Sprint 1)
+- [x] Definición de Modelo de Negocio (Lean Canvas).
+- [x] Análisis de Mercado (TAM, SAM, SOM).
+- [x] Definición de User Persona y Customer Journey.
+- [x] Identificación de APIs clave (OpenWeatherMap, Google Places).
+- [x] Definición de OKRs y KPIs.
+
+---
+
+### 🛠️ Estructura del Repositorio
+* `/docs`: Documentación técnica y entregables del Sprint.
+* `/src`: Código fuente (en desarrollo para Sprint 2).
+* `/tests`: Pruebas unitarias e integración.
+
+**Compartido con:** FelixVillanueva
