@@ -1,3 +1,6 @@
+![TravelSense Logo](TravelSenseLogo.png)
+
+
 ## TravelSense - Context-Aware Travel Support System
 
 ## 🚀 Proyecto ISI 2025-2026 (Sprint 1)
