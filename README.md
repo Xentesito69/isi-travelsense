@@ -1,4 +1,4 @@
-![TravelSense Logo](TravelSenseLogo.png)
+![TravelSense Logo](TravelSenceLogo.png)
 
 
 ## TravelSense - Context-Aware Travel Support System
