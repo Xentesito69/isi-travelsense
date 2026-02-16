@@ -1,3 +1,9 @@
-💡Motivación
+## 💡Motivación
 
-Planificar un viaje requiere usar varias aplicaciones separadas (clima, mapas, restaurantes, ocio), lo que provoca pérdida de tiempo y decisiones poco óptimas. TravelSense integra estas fuentes y procesa la información para apoyar la toma de decisiones, generando recomendaciones contextuales y un itinerario diario adaptado a clima, preferencias y distancia, maximizando la experiencia del usuario (ocio, deporte y gastronomía). 
+La planificación de viajes actual presenta una fuerte fragmentación de información: el usuario debe
+consultar múltiples aplicaciones (clima, mapas y reseñas), lo que genera sobrecarga cognitiva y
+decisiones ineficientes.
+TravelSense integra datos en tiempo real (meteorología y geolocalización) con un modelo de
+Inteligencia Artificial Generativa capaz de filtrar opciones según el contexto, adaptar dinámicamente
+las recomendaciones y reducir el tiempo de planificación de aproximadamente 45 minutos a menos de
+2.
