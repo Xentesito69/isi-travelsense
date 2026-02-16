@@ -1,11 +1,13 @@
 ## 👤 Perfil del cliente 
 
-Segmentos objetivo:  
+### Segmentos objetivo:  
 • Turistas urbanos que buscan optimización del tiempo.  
 • Deportistas que dependen de condiciones meteorológicas.  
 • Usuarios interesados en experiencias gastronómicas y personalizadas.   
 
-User Persona – Javier (26 años): Profesional digital con poco tiempo libre que busca decisiones
+### User Persona – Javier (26 años): 
+
+Profesional digital con poco tiempo libre que busca decisiones
 optimizadas sin consultar múltiples aplicaciones. Sufre fatiga de decisión y valora soluciones
 automatizadas que integren clima, localización y preferencias personales en un único resultado
 narrativo.   
