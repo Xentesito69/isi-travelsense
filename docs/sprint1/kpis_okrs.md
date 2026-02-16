@@ -15,6 +15,8 @@ para que la IA personalice el resultado.
 que la IA ya les guardó en la base de datos.  
 
 
+
+
 ## OKRs   
 ### O1 – Desarrollar un MVP potenciado por IA y totalmente integrado  
 • KR1: Integrar con éxito las APIs de Google Maps, OpenWeather y un modelo de IA 
