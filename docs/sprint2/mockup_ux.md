@@ -9,17 +9,7 @@ TravelSense tiene una **Single Page Application (SPA)** en `GUI/index.html`. Dis
 ## 2. Pantallas Principales
 
 ### 🏠 Inicio / Hero
-```
-┌──────────────────────────────────────────────────────┐
-│  🌍  TravelSense                         [Logo]      │
-│                                                      │
-│         "Descubre tu próxima aventura"               │
-│                                                      │
-│     [Explorar Destinos]   [Ver Itinerarios]          │
-│                                                      │
-│   250+ Destinos  |  1000+ Eventos  |  100 Usuarios   │
-└──────────────────────────────────────────────────────┘
-```
+<img width="1919" height="1019" alt="Captura de pantalla 2026-03-21 185701" src="https://github.com/user-attachments/assets/e9c44f27-b5ca-45e6-9dac-3bfa62ade02a" />
 
 ### 🗺️ Explorador de Destinos
 ```
