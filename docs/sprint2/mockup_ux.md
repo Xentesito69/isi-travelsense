@@ -18,56 +18,17 @@ TravelSense tiene una **Single Page Application (SPA)** en `GUI/index.html`. Dis
 **UX:** Grid de tarjetas con búsqueda en tiempo real y hover animation.
 
 ### 🎟️ Eventos por Destino
-```
-┌──────────────────────────────────────────────────────┐
-│  Eventos en: [Selecciona ciudad ▾]                   │
-│                                                      │
-│  🎵 Festival Primavera Sound   Música  | 180€  [Ver] │
-│  ──────────────────────────────────────────          │
-│  ⚽ FC Barcelona vs Valencia   Deporte | 90€   [Ver] │
-│  ──────────────────────────────────────────          │
-│  🎨 Exposición Gaudí           Cultura | 25€   [Ver] │
-└──────────────────────────────────────────────────────┘
-```
+<img width="1915" height="1015" alt="Captura de pantalla 2026-03-21 185845" src="https://github.com/user-attachments/assets/b9c85ac8-cc2a-4254-841b-3da1bb7955c8" />
+
 
 ### 📅 Mis Itinerarios
-```
-┌──────────────────────────────────────────────────────┐
-│  Mis Itinerarios               [+ Nuevo Itinerario]  │
-│                                                      │
-│  ┌────────────────────────────────────────────┐      │
-│  │ 📍 Barcelona          Jul 1 → Jul 7        │      │
-│  │ 👤 María García    💰 1.200€               │      │
-│  │ Actividades: Sagrada Familia, Tapas...     │      │
-│  │                           [Ver detalle]   │      │
-│  └────────────────────────────────────────────┘      │
-└──────────────────────────────────────────────────────┘
-```
+<img width="1918" height="1022" alt="Captura de pantalla 2026-03-21 185914" src="https://github.com/user-attachments/assets/97fe3714-f803-4ce9-bda1-8e5fe4fb183f" />
+
 
 ---
 
-## 3. Mapa de Navegación
 
-```
-              ┌─────────┐
-              │  INICIO │
-              └────┬────┘
-                   │
-     ┌─────────────┼─────────────┐
-     │             │             │
-┌────▼────┐  ┌─────▼─────┐  ┌──▼──────────┐
-│Destinos │  │  Eventos  │  │ Itinerarios │
-└────┬────┘  └─────┬─────┘  └──┬──────────┘
-     │              │           │
-┌────▼────┐   ┌─────▼───┐  ┌──▼──────────┐
-│ Detalle │   │ Filtrar │  │   Detalle   │
-│Destino  │   │ Ciudad  │  │ Itinerario  │
-└─────────┘   └─────────┘  └─────────────┘
-```
-
----
-
-## 4. Decisiones de Diseño UX
+## 3. Decisiones de Diseño UX
 
 | Principio | Implementación |
 |---|---|
@@ -79,7 +40,7 @@ TravelSense tiene una **Single Page Application (SPA)** en `GUI/index.html`. Dis
 
 ---
 
-## 5. Paleta de Colores
+## 4. Paleta de Colores
 
 | Elemento | Valor |
 |---|---|
