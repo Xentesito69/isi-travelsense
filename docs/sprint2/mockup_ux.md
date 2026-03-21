@@ -13,16 +13,8 @@ TravelSense tiene una **Single Page Application (SPA)** en `GUI/index.html`. Dis
 
 ### 🗺️ Explorador de Destinos
 ```
-┌──────────────────────────────────────────────────────┐
-│  🔍 [Buscar destino...]     Filtro: [Europa ▾]       │
-│                                                      │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
-│  │Barcelona │  │  París   │  │  Tokio   │           │
-│  │🌡 Suave  │  │🌡Templado│  │🌡 Húmedo │           │
-│  │ España   │  │ Francia  │  │  Japón   │           │
-│  │ [Ver más]│  │ [Ver más]│  │ [Ver más]│           │
-│  └──────────┘  └──────────┘  └──────────┘           │
-└──────────────────────────────────────────────────────┘
+<img width="1919" height="1014" alt="Captura de pantalla 2026-03-21 185749" src="https://github.com/user-attachments/assets/26635f0f-8f4c-4ecc-87b8-d653ea46fa9a" />
+
 ```
 **UX:** Grid de tarjetas con búsqueda en tiempo real y hover animation.
 
