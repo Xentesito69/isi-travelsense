@@ -12,10 +12,9 @@ TravelSense tiene una **Single Page Application (SPA)** en `GUI/index.html`. Dis
 <img width="1919" height="1019" alt="Captura de pantalla 2026-03-21 185701" src="https://github.com/user-attachments/assets/e9c44f27-b5ca-45e6-9dac-3bfa62ade02a" />
 
 ### 🗺️ Explorador de Destinos
-```
+
 <img width="1919" height="1014" alt="Captura de pantalla 2026-03-21 185749" src="https://github.com/user-attachments/assets/26635f0f-8f4c-4ecc-87b8-d653ea46fa9a" />
 
-```
 **UX:** Grid de tarjetas con búsqueda en tiempo real y hover animation.
 
 ### 🎟️ Eventos por Destino
