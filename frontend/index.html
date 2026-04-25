@@ -953,7 +953,7 @@
         <!-- Home View -->
                 <section id="home" class="view-section active">
             <!-- Welcome Banner -->
-            <div style="background: linear-gradient(135deg, var(--brand-dark-blue), #1a5276); padding: 32px 36px; border-radius: 20px; margin-bottom: 28px; position: relative; overflow: hidden; box-shadow: var(--shadow-md);">
+            <div style="background: linear-gradient(135deg, var(--brand-dark-blue), #1a5276); padding: 32px 36px; border-radius: 20px; margin-bottom: 28px; margin-top: 5px; position: relative; overflow: hidden; box-shadow: var(--shadow-md);">
                 <div style="position:relative; z-index:2;">
                     <div style="font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:6px;">TravelSense Dashboard</div>
                     <h2 id="welcome-header" style="margin:0 0 6px; color:#fff; font-size:2rem; font-weight:700;">Bienvenido, <span id="home-user-name" style="color:var(--brand-teal);">Viajero</span> ✈️</h2>
@@ -1860,7 +1860,7 @@
                 if (genBtn) switchAITab('generator', genBtn);
             }
             if (viewId !== 'settings' && viewId !== 'home') loadData(viewId);
-            if (viewId === 'home') { loadData('home'); setTimeout(() => { if (typeof renderHomeWidgets === 'function') renderHomeWidgets(); }, 900); }
+            if (viewId === 'home') { loadData('home'); waitForDataAndRenderHome(); }
 
             // Refresh map if switching to destinations
             if (viewId === 'destinations' && map) {
@@ -3683,6 +3683,16 @@ S� muy espec�fico con los precios reales actuales del destino.`;
             }
         }
 
+        function waitForDataAndRenderHome(attempt) {
+            attempt = attempt || 0;
+            if (window.allDestinations && window.allDestinations.length > 0) {
+                renderHomeWidgets();
+            } else if (attempt < 20) {
+                setTimeout(() => waitForDataAndRenderHome(attempt + 1), 300);
+            } else {
+                renderHomeWidgets(); // render anyway with whatever we have
+            }
+        }
         function renderHomeWidgets() {
             // Update greeting name
             const profile = JSON.parse(localStorage.getItem('travelsense_profile') || '{}');
@@ -4693,6 +4703,7 @@ function haversine(lat1, lon1, lat2, lon2) {
             loadUserProfile();
             if (typeof updateUserStats === 'function') updateUserStats();
             fetchDestinations();
+            waitForDataAndRenderHome();
         });
     
         function switchItinTab(tab, btn) {
