@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -109,6 +109,9 @@
             box-shadow: 5px 0 25px rgba(0, 0, 0, 0.03);
             z-index: 10;
             backdrop-filter: blur(10px);
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
         }
 
         .logo {
@@ -236,6 +239,15 @@
         .nav-link i {
             width: 20px;
             text-align: center;
+        }
+
+                /* AI Content constraints */
+        #gen-result-content, #packing-result-content, #comp-result {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        #gen-result-content *, #packing-result-content *, #comp-result * {
+            max-width: 100% !important;
         }
 
         /* Main Content */
@@ -752,6 +764,48 @@
             background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
         }
     </style>
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <style>
+        /* Chatbot Styles */
+        .chat-widget {
+            position: fixed; bottom: 20px; right: 20px; z-index: 10000;
+        }
+        .chat-btn {
+            width: 60px; height: 60px; border-radius: 50%; background: var(--brand-teal);
+            color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 1.5rem; cursor: pointer; transition: transform 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .chat-btn:hover { transform: scale(1.1); }
+        .chat-window {
+            position: absolute; bottom: 80px; right: 0; width: 350px; height: 450px;
+            background: var(--card-bg); border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+            display: none; flex-direction: column; overflow: hidden; border: 1px solid var(--border-color);
+        }
+        .chat-header {
+            background: linear-gradient(135deg, var(--brand-teal), #0984e3); color: white;
+            padding: 15px; font-weight: bold; display: flex; justify-content: space-between;
+        }
+        .chat-messages {
+            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+        }
+        .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; }
+        .msg.user { background: var(--brand-teal); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg.bot { background: var(--border-color); color: var(--text-header); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .chat-input-area {
+            padding: 10px; border-top: 1px solid var(--border-color); display: flex; gap: 8px;
+        }
+        .chat-input {
+            flex: 1; background: var(--bg-dark); border: 1px solid var(--border-color);
+            color: var(--text-header); padding: 10px; border-radius: 20px; outline: none;
+        }
+        .chat-send {
+            background: var(--brand-teal); color: white; border: none; width: 40px; height: 40px;
+            border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -794,18 +848,45 @@
 
     <!-- Login Overlay -->
     <div id="login-overlay">
-        <div class="login-card">
-            <div style="margin-bottom: 20px;">
-                <img src="logodark.png" alt="TravelSense" style="width: 120px;">
+        <div class="login-card" style="text-align: center; padding: 40px; max-width: 400px; width: 100%;">
+            <div style="margin-bottom: 25px;">
+                <img src="logodark.png" alt="TravelSense" style="width: 140px; margin-bottom: 15px;">
+                <h2 style="color:white; margin: 0; font-weight: 700; font-size: 1.8rem;">TravelSense</h2>
+                <p style="color:var(--text-muted); margin-top: 5px; font-size: 0.95rem;">Tu compañero de viaje inteligente con IA</p>
             </div>
-            <h2 style="color:white; margin-bottom: 30px; font-weight: 600;">TravelSense Access</h2>
-            <input type="email" class="login-input" placeholder="traveler@travelsense.com"
-                value="admin@travelsense.com">
-            <input type="password" class="login-input" placeholder="••••••••" value="password">
-            <button class="populate-btn" onclick="login()"
-                style="width: 100%; justify-content: center; margin-top: 10px;">
-                Iniciar Sesión <i class="fas fa-arrow-right"></i>
-            </button>
+            
+            <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0; margin-bottom:15px;">Inicia sesión para continuar</p>
+                
+                <div id="g_id_onload"
+                     data-client_id="866300476470-4ebnghpoi029fimkh1pfad7o8ajfv3ka.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left"
+                     style="display: flex; justify-content: center; margin-bottom: 15px;">
+                </div>
+                
+                <div style="display:flex; align-items:center; margin: 15px 0;">
+                    <hr style="flex:1; border:none; border-top:1px solid var(--border-color);"><span style="padding:0 10px; color:var(--text-muted); font-size:0.8rem;">O</span><hr style="flex:1; border:none; border-top:1px solid var(--border-color);">
+                </div>
+
+                <button class="populate-btn" onclick="loginAsGuest()"
+                    style="width: 100%; justify-content: center; background: transparent; border: 1px solid var(--brand-teal); color: var(--brand-teal);">
+                    <i class="fas fa-user-astronaut" style="margin-right:8px;"></i> Continuar como Invitado
+                </button>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                Protegido con encriptación y aislamiento multi-cuenta.
+            </div>
         </div>
     </div>
 
@@ -818,8 +899,8 @@
         <a class="nav-link active" onclick="showView('home')">
             <i class="fas fa-home"></i> Inicio
         </a>
-        <a class="nav-link" onclick="showView('users')">
-            <i class="fas fa-users"></i> Usuarios
+        <a class="nav-link" onclick="showView('travelers')">
+            <i class="fas fa-users"></i> Viajeros
         </a>
         <a class="nav-link" onclick="showView('destinations')">
             <i class="fas fa-map-marked-alt"></i> Destinos
@@ -842,6 +923,9 @@
         <a class="nav-link" onclick="showView('passport')">
             <i class="fas fa-passport"></i> Pasaporte
         </a>
+        <a class="nav-link" onclick="showView('profile')">
+            <i class="fas fa-user-circle"></i> Mi Perfil
+        </a>
         <a class="nav-link" onclick="showView('settings')">
             <i class="fas fa-cog"></i> Configuración
         </a>
@@ -860,72 +944,144 @@
                         alt="User Avatar"
                         style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-secondary);">
                 </div>
-                <button class="populate-btn" onclick="populateDatabase()">
+                <button class="populate-btn" onclick="populateDatabase()" style="display:none;">
                     <i class="fas fa-magic"></i> Generar Datos
                 </button>
             </div>
         </header>
 
         <!-- Home View -->
-        <section id="home" class="view-section active">
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div class="card-title">Usuarios Totales</div>
-                    <div class="card-value" id="stat-users">-</div>
+                <section id="home" class="view-section active">
+            <!-- Welcome Banner -->
+            <div style="background: linear-gradient(135deg, var(--brand-dark-blue), #1a5276); padding: 32px 36px; border-radius: 20px; margin-bottom: 28px; position: relative; overflow: hidden; box-shadow: var(--shadow-md);">
+                <div style="position:relative; z-index:2;">
+                    <div style="font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:6px;">TravelSense Dashboard</div>
+                    <h2 id="welcome-header" style="margin:0 0 6px; color:#fff; font-size:2rem; font-weight:700;">Bienvenido, <span id="home-user-name" style="color:var(--brand-teal);">Viajero</span> ✈️</h2>
+                    <p style="color:rgba(255,255,255,0.6); margin:0; font-size:0.95rem;">¿A dónde volarás hoy?</p>
                 </div>
-                <div class="card">
-                    <div class="card-title">Destinos Activos</div>
+                <i class="fas fa-globe-americas" style="position:absolute; right:-20px; bottom:-30px; font-size:13rem; opacity:0.06; color:#fff;"></i>
+            </div>
+            <!-- Stats Row -->
+            <div class="dashboard-grid" style="margin-bottom:28px;">
+                <div class="card" onclick="showView('passport')" style="cursor:pointer; transition:transform 0.2s; text-align:center;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+                    <div style="font-size:2rem; margin-bottom:4px;">🗺️</div>
+                    <div class="card-value" id="stat-visited" style="color:var(--brand-orange)">0</div>
+                    <div class="card-title">Lugares Visitados</div>
+                </div>
+                <div class="card" onclick="showView('profile')" style="cursor:pointer; transition:transform 0.2s; text-align:center;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+                    <div style="font-size:2rem; margin-bottom:4px;">❤️</div>
+                    <div class="card-value" id="stat-favs" style="color:var(--brand-teal)">0</div>
+                    <div class="card-title">Favoritos</div>
+                </div>
+                <div class="card" onclick="showView('itineraries')" style="cursor:pointer; transition:transform 0.2s; text-align:center;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+                    <div style="font-size:2rem; margin-bottom:4px;">📋</div>
+                    <div class="card-value" id="stat-my-itins" style="color:var(--brand-teal)">0</div>
+                    <div class="card-title">Itinerarios</div>
+                </div>
+                <div class="card" onclick="showView('destinations')" style="cursor:pointer; transition:transform 0.2s; text-align:center;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+                    <div style="font-size:2rem; margin-bottom:4px;">🌍</div>
                     <div class="card-value" id="stat-dests">-</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Eventos Locales</div>
-                    <div class="card-value" id="stat-events">-</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Itinerarios IA</div>
-                    <div class="card-value" id="stat-itineraries">-</div>
+                    <div class="card-title">Destinos Disponibles</div>
                 </div>
             </div>
-
-            <div
-                style="background: var(--card-bg); padding: 35px; border-radius: 16px; border: var(--glass-border); position: relative; overflow: hidden; box-shadow: var(--shadow-sm);">
-                <h3 id="welcome-header" style="color: var(--accent-primary); margin-top: 0; font-size: 1.5rem;">
-                    <i class="fas fa-sparkles"></i> Bienvenido a TravelSense
-                </h3>
-                <p style="color: var(--text-muted); line-height: 1.8; max-width: 800px;">
-                    Tu sistema de soporte a la decisión basado en Inteligencia Artificial.
-                    Utiliza el motor de generación para crear itinerarios hiper-personalizados que combinan
-                    datos meteorológicos en tiempo real con las preferencias de tus usuarios.
-                </p>
-                <div style="margin-top: 25px; display: flex; gap: 20px;">
-                    <button class="populate-btn" onclick="showView('itineraries')"
-                        style="background: transparent; border: 1px solid var(--brand-teal); color: var(--brand-teal); box-shadow: none;">
-                        Ver Últimos Itinerarios
+            <!-- Gemini Chat -->
+            <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:28px; margin-bottom:28px; box-shadow:var(--shadow-sm);">
+                <h3 style="margin:0 0 16px; color:var(--text-header); font-size:1.1rem;"><i class="fas fa-robot" style="color:var(--brand-teal); margin-right:8px;"></i>Pregunta a Gemini AI</h3>
+                <div style="display:flex; gap:10px; align-items:stretch;">
+                    <textarea id="home-gemini-input" placeholder="Ej: ¿Qué destino me recomiendas para verano con niños? ¿Qué documentos necesito para Japón?..."
+                        style="flex:1; padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-gradient); color:var(--text-main); font-family:inherit; font-size:0.95rem; resize:none; height:56px; outline:none; transition:border 0.2s;"
+                        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askHomeGemini();}"
+                        onfocus="this.style.borderColor='var(--brand-teal)'" onblur="this.style.borderColor='var(--border-color)'"></textarea>
+                    <button onclick="askHomeGemini()" id="home-gemini-btn"
+                        style="padding:0 22px; background:var(--brand-teal); color:#fff; border:none; border-radius:12px; cursor:pointer; font-size:1rem; font-family:inherit; font-weight:600; transition:opacity 0.2s; white-space:nowrap;"
+                        onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                        <i class="fas fa-paper-plane"></i>
                     </button>
+                </div>
+                <div id="home-gemini-result" style="display:none; margin-top:16px; padding:16px; background:rgba(0,184,148,0.06); border-left:3px solid var(--brand-teal); border-radius:10px; color:var(--text-main); line-height:1.7; font-size:0.95rem;"></div>
+            </div>
+            <!-- AI Tool Shortcuts -->
+            <div style="margin-bottom:28px;">
+                <h3 style="color:var(--text-header); font-size:1rem; margin:0 0 14px;"><i class="fas fa-magic" style="color:var(--brand-orange); margin-right:8px;"></i>Herramientas de IA</h3>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px;">
+                    <button onclick="showView('ai-tools'); setTimeout(()=>switchAITab('generator',document.querySelector('#ai-tools .tabs .filter-btn')),100);"
+                        style="padding:16px 12px; background:var(--card-bg); border:var(--glass-border); border-radius:14px; cursor:pointer; color:var(--text-main); font-family:inherit; font-size:0.88rem; font-weight:600; display:flex; flex-direction:column; align-items:center; gap:8px; transition:all 0.2s; box-shadow:var(--shadow-sm);"
+                        onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='var(--brand-teal)'" onmouseout="this.style.transform='none';this.style.borderColor=''">
+                        <i class="fas fa-route" style="font-size:1.4rem; color:var(--brand-teal);"></i>Generar Itinerario
+                    </button>
+                    <button onclick="showView('ai-tools'); setTimeout(()=>{ var b=document.querySelectorAll('#ai-tools .tabs .filter-btn'); if(b[1]) switchAITab('budget',b[1]); },100);"
+                        style="padding:16px 12px; background:var(--card-bg); border:var(--glass-border); border-radius:14px; cursor:pointer; color:var(--text-main); font-family:inherit; font-size:0.88rem; font-weight:600; display:flex; flex-direction:column; align-items:center; gap:8px; transition:all 0.2s; box-shadow:var(--shadow-sm);"
+                        onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='var(--brand-orange)'" onmouseout="this.style.transform='none';this.style.borderColor=''">
+                        <i class="fas fa-wallet" style="font-size:1.4rem; color:var(--brand-orange);"></i>Calcular Presupuesto
+                    </button>
+                    <button onclick="showView('ai-tools'); setTimeout(()=>{ var b=document.querySelectorAll('#ai-tools .tabs .filter-btn'); if(b[2]) switchAITab('packing',b[2]); },100);"
+                        style="padding:16px 12px; background:var(--card-bg); border:var(--glass-border); border-radius:14px; cursor:pointer; color:var(--text-main); font-family:inherit; font-size:0.88rem; font-weight:600; display:flex; flex-direction:column; align-items:center; gap:8px; transition:all 0.2s; box-shadow:var(--shadow-sm);"
+                        onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='#6c5ce7'" onmouseout="this.style.transform='none';this.style.borderColor=''">
+                        <i class="fas fa-suitcase-rolling" style="font-size:1.4rem; color:#6c5ce7;"></i>Lista de Equipaje
+                    </button>
+                    <button onclick="showView('ai-tools'); setTimeout(()=>{ var b=document.querySelectorAll('#ai-tools .tabs .filter-btn'); if(b[3]) switchAITab('compare',b[3]); },100);"
+                        style="padding:16px 12px; background:var(--card-bg); border:var(--glass-border); border-radius:14px; cursor:pointer; color:var(--text-main); font-family:inherit; font-size:0.88rem; font-weight:600; display:flex; flex-direction:column; align-items:center; gap:8px; transition:all 0.2s; box-shadow:var(--shadow-sm);"
+                        onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='#e17055'" onmouseout="this.style.transform='none';this.style.borderColor=''">
+                        <i class="fas fa-balance-scale" style="font-size:1.4rem; color:#e17055;"></i>Comparar Destinos
+                    </button>
+                </div>
+            </div>
+            <!-- Bottom summary row -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+                <div style="background:var(--card-bg); border:var(--glass-border); border-radius:16px; padding:22px; box-shadow:var(--shadow-sm);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <h4 style="margin:0; color:var(--text-header); font-size:0.95rem;"><i class="fas fa-heart" style="color:var(--brand-orange); margin-right:7px;"></i>Tus Favoritos</h4>
+                        <button onclick="showView('profile')" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-size:0.8rem; font-family:inherit;">Ver todos →</button>
+                    </div>
+                    <div id="home-favs-list" style="display:flex; flex-direction:column; gap:8px;"><div style="color:var(--text-muted); font-size:0.88rem; text-align:center; padding:10px;">Cargando...</div></div>
+                </div>
+                <div style="background:var(--card-bg); border:var(--glass-border); border-radius:16px; padding:22px; box-shadow:var(--shadow-sm);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <h4 style="margin:0; color:var(--text-header); font-size:0.95rem;"><i class="fas fa-stamp" style="color:var(--brand-teal); margin-right:7px;"></i>Lugares Visitados</h4>
+                        <button onclick="showView('passport')" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-size:0.8rem; font-family:inherit;">Ver pasaporte →</button>
+                    </div>
+                    <div id="home-visited-list" style="display:flex; flex-direction:column; gap:8px;"><div style="color:var(--text-muted); font-size:0.88rem; text-align:center; padding:10px;">Cargando...</div></div>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+                <div style="background:var(--card-bg); border:var(--glass-border); border-radius:16px; padding:22px; box-shadow:var(--shadow-sm);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <h4 style="margin:0; color:var(--text-header); font-size:0.95rem;"><i class="fas fa-route" style="color:#6c5ce7; margin-right:7px;"></i>Itinerarios Creados</h4>
+                        <button onclick="showView('itineraries')" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-size:0.8rem; font-family:inherit;">Ver todos →</button>
+                    </div>
+                    <div id="home-itins-list" style="display:flex; flex-direction:column; gap:8px;"><div style="color:var(--text-muted); font-size:0.88rem; text-align:center; padding:10px;">Cargando...</div></div>
+                </div>
+                <div style="background:var(--card-bg); border:var(--glass-border); border-radius:16px; padding:22px; box-shadow:var(--shadow-sm);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <h4 style="margin:0; color:var(--text-header); font-size:0.95rem;"><i class="fas fa-map-marked-alt" style="color:var(--brand-orange); margin-right:7px;"></i>Destinos Disponibles</h4>
+                        <button onclick="showView('destinations')" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-size:0.8rem; font-family:inherit;">Ver todos →</button>
+                    </div>
+                    <div id="home-dests-list" style="display:flex; flex-direction:column; gap:8px;"><div style="color:var(--text-muted); font-size:0.88rem; text-align:center; padding:10px;">Cargando...</div></div>
                 </div>
             </div>
         </section>
 
-        <!-- Users View -->
+        <!-- Users View (Admin Only, hidden) -->
         <section id="users" class="view-section">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="user-search" class="search-input"
-                    placeholder="Buscar usuarios por nombre, email o preferencias..." onkeyup="filterUsers()">
-            </div>
             <div class="table-container">
-                <table id="users-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th style="text-align: center;">País</th>
-                            <th>Email</th>
-                            <th>Preferencias</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <table id="users-table"><thead><tr><th>ID</th><th>Nombre</th><th>Email</th></tr></thead><tbody></tbody></table>
+            </div>
+        </section>
+
+        <!-- Travelers View -->
+        <section id="travelers" class="view-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h2 style="margin:0; color:var(--text-header);"><i class="fas fa-users" style="color:var(--brand-teal);"></i> Comunidad de Viajeros</h2>
+                    <p style="color:var(--text-muted); margin:4px 0 0;">Explora y conecta con otros viajeros</p>
+                </div>
+                <div class="search-container" style="margin:0; width:300px;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="travelers-search" class="search-input" placeholder="Buscar por nombre o ciudad..." onkeyup="filterTravelers()" style="padding-left:40px;">
+                </div>
+            </div>
+            <div id="travelers-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:20px;">
+                <!-- Viajeros renderizados aquí -->
             </div>
         </section>
 
@@ -1059,6 +1215,36 @@
                     </label>
                 </div>
 
+                <h3 style="color: var(--text-header); margin-bottom: 20px; margin-top: 40px;"><i class="fas fa-user-shield"></i> Seguridad y Privacidad</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9rem;"><i class="fas fa-heart" style="color:var(--brand-orange)"></i> Mostrar Favoritos</span>
+                        <input type="checkbox" id="priv-favs" checked onchange="savePrivacy()" style="width:18px; height:18px; accent-color:var(--brand-teal);">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9rem;"><i class="fas fa-route" style="color:var(--brand-teal)"></i> Mostrar Itinerarios</span>
+                        <input type="checkbox" id="priv-itin" checked onchange="savePrivacy()" style="width:18px; height:18px; accent-color:var(--brand-teal);">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9rem;"><i class="fas fa-passport" style="color:var(--brand-orange)"></i> Mostrar Pasaporte</span>
+                        <input type="checkbox" id="priv-passport" checked onchange="savePrivacy()" style="width:18px; height:18px; accent-color:var(--brand-teal);">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9rem;"><i class="fas fa-clipboard-check" style="color:var(--brand-teal)"></i> Mostrar Checklists</span>
+                        <input type="checkbox" id="priv-check" onchange="savePrivacy()" style="width:18px; height:18px; accent-color:var(--brand-teal);">
+                    </div>
+                </div>
+
+                <div style="background: rgba(235, 77, 75, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(235, 77, 75, 0.2); margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0; color: #eb4d4b;">Eliminar Cuenta</h4>
+                        <p style="margin: 5px 0 0; font-size: 0.8rem; color: var(--text-muted);">Borra permanentemente todos tus datos de este dispositivo.</p>
+                    </div>
+                    <button class="populate-btn" onclick="deleteAccount()" style="background: #eb4d4b; color: white; border: none; padding: 10px 20px;">
+                        <i class="fas fa-trash-alt"></i> ELIMINAR
+                    </button>
+                </div>
+
                 <h3 style="color: var(--text-header); margin-bottom: 20px; margin-top: 40px;">Sistema</h3>
                 <div class="switch-container">
                     <div>
@@ -1167,7 +1353,7 @@
                         <div style="flex:1; min-width:200px;">
                             <label style="display:block; font-weight:600; margin-bottom:8px;">Destino A</label>
                             <select id="comp-dest-1" class="search-input" style="width:100%; margin:0;"
-                                onchange="compareDestinations()">
+                                onchange="compareDestinationsWithGemini()">
                                 <option value="">Selecciona Destino A</option>
                             </select>
                         </div>
@@ -1175,7 +1361,7 @@
                         <div style="flex:1; min-width:200px;">
                             <label style="display:block; font-weight:600; margin-bottom:8px;">Destino B</label>
                             <select id="comp-dest-2" class="search-input" style="width:100%; margin:0;"
-                                onchange="compareDestinations()">
+                                onchange="compareDestinationsWithGemini()">
                                 <option value="">Selecciona Destino B</option>
                             </select>
                         </div>
@@ -1245,7 +1431,7 @@
                         </div>
                     </div>
 
-                    <button class="populate-btn" onclick="generatePackingList()"
+                    <button class="populate-btn" onclick="generatePackingListWithGemini()"
                         style="width:100%; justify-content:center; margin-top:20px; height:50px; font-size:1.1rem; background:var(--brand-teal); color:white;">
                         <i class="fas fa-list-check" style="margin-right:8px;"></i> Generar Checklist
                     </button>
@@ -1297,7 +1483,7 @@
                         </div>
                     </div>
 
-                    <button class="populate-btn" onclick="calculateBudget()"
+                    <button class="populate-btn" onclick="calculateBudgetWithGemini()"
                         style="width:100%; justify-content:center; margin-top:20px; height:50px; font-size:1.1rem; background:#6c5ce7; color:white;">
                         <i class="fas fa-coins" style="margin-right:8px;"></i> Calcular Coste
                     </button>
@@ -1421,17 +1607,16 @@
         </section>
 
         <!-- Passport View -->
+                <!-- Passport View -->
         <section id="passport" class="view-section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:12px;">
                 <div>
                     <h2 style="margin:0; color:var(--text-header);">Pasaporte Digital 🛂</h2>
-                    <p style="color:var(--text-muted); margin:5px 0 0 0;">Tu historial de viajes y logros desbloqueados.
-                    </p>
+                    <p style="color:var(--text-muted); margin:5px 0 0 0;">Tus lugares visitados y logros desbloqueados.</p>
                 </div>
                 <div style="text-align:right;">
-                    <div class="badge"
-                        style="background:var(--brand-teal); color:white; font-size:1rem; padding:8px 15px;">
-                        Nivel: <span id="passport-level">Viajero Novato</span> 🌟
+                    <div class="badge" style="background:var(--brand-teal); color:white; font-size:1rem; padding:8px 15px;">
+                        Nivel: <span id="passport-level">Aspirante a Viajero 🌱</span>
                     </div>
                 </div>
             </div>
@@ -1440,7 +1625,7 @@
             <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr); gap:20px; margin-bottom:40px;">
                 <div class="stat-badge">
                     <div style="font-size:2rem; font-weight:700; color:var(--brand-teal);" id="passport-trips">0</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem;">Viajes Realizados</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem;">Lugares Visitados</div>
                 </div>
                 <div class="stat-badge">
                     <div style="font-size:2rem; font-weight:700; color:#e17055;" id="passport-km">0</div>
@@ -1457,20 +1642,17 @@
                 <div style="position:absolute; top:15px; right:20px; color:rgba(255,255,255,0.3); font-size:1.5rem;">
                     <i class="fas fa-globe-americas"></i>
                 </div>
-                <div
-                    style="text-align:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
-                    <h3 style="margin:0; letter-spacing:2px; text-transform:uppercase;">Visados & Entradas</h3>
+                <div style="text-align:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
+                    <h3 style="margin:0; letter-spacing:2px; text-transform:uppercase;">Visados &amp; Entradas</h3>
                 </div>
-
                 <div class="passport-page" id="passport-stamps-grid"
                     style="display:flex; flex-wrap:wrap; align-content:flex-start; justify-content:center;">
                     <!-- Stamps injected here -->
-                    <div style="width:100%; text-align:center; margin-top:100px; opacity:0.5; font-style:italic;"
+                    <div style="width:100%; text-align:center; margin-top:80px; opacity:0.5; font-style:italic;"
                         id="passport-empty-msg">
-                        Sin sellos todavía. ¡Genera itinerarios para viajar!
+                        Sin sellos todavía. ¡Marca destinos como visitados desde la sección Destinos!
                     </div>
                 </div>
-
                 <div style="text-align:center; margin-top:15px; font-size:0.8rem; opacity:0.6;">
                     TravelSense Official Document
                 </div>
@@ -1521,7 +1703,122 @@
             }, 500);
         }
 
+        // --- Multi-Account Namespace & Isolation ---
+        const USER_DATA_KEYS = [
+            'ts_onboarding_done', 'travelsense_profile', 'travelsense_favorites', 
+            'travelsense_visited', 'travelsense_itineraries', 'travelsense_checklists', 
+            'ts_following', 'ts_privacy'
+        ];
+
+        function getUserNs(email) {
+            let hash = 0;
+            for (let i = 0; i < email.length; i++) hash = ((hash << 5) - hash) + email.charCodeAt(i);
+            return 'ts_u_' + Math.abs(hash).toString(36) + '_';
+        }
+
+        function saveCurrentUserData() {
+            const email = localStorage.getItem('ts_current_user_email');
+            if (!email) return;
+            const ns = getUserNs(email);
+            USER_DATA_KEYS.forEach(k => {
+                const val = localStorage.getItem(k);
+                if (val !== null) localStorage.setItem(ns + k, val);
+                else localStorage.removeItem(ns + k);
+            });
+        }
+
+        function loadUserData(email) {
+            const ns = getUserNs(email);
+            USER_DATA_KEYS.forEach(k => {
+                const val = localStorage.getItem(ns + k);
+                if (val !== null) localStorage.setItem(k, val);
+                else localStorage.removeItem(k);
+            });
+        }
+
+        // --- Community / Follow System ---
+        function getFollowing() {
+            return JSON.parse(localStorage.getItem('ts_following') || '[]');
+        }
+
+        function isFollowing(id) {
+            return getFollowing().includes(id);
+        }
+
+        function toggleFollow(travelerId, travelerName) {
+            let following = getFollowing();
+            if (following.includes(travelerId)) {
+                following = following.filter(id => id !== travelerId);
+                showToast(`Dejaste de seguir a ${travelerName}`, 'info');
+            } else {
+                following.push(travelerId);
+                showToast(`¡Ahora sigues a ${travelerName}!`, 'success');
+            }
+            localStorage.setItem('ts_following', JSON.stringify(following));
+            saveCurrentUserData();
+            
+            // Refresh views if open
+            if (document.getElementById('travelers').classList.contains('active')) {
+                loadTravelers();
+            }
+        }
+
+        function getFollowerCount(travelerId) {
+            try {
+                const currEmail = localStorage.getItem('ts_current_user_email') || '';
+                const community = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
+                let count = 0;
+                community.forEach(u => {
+                    if (u.email === currEmail) return;
+                    const f = JSON.parse(localStorage.getItem(u.ns + 'ts_following') || '[]');
+                    if (f.includes(travelerId)) count++;
+                });
+                if (isFollowing(travelerId)) count++;
+                return count;
+            } catch(e) { return 0; }
+        }
+
+        function getFollowingCount(travelerId) {
+            if (travelerId === 'me') return getFollowing().length;
+            try {
+                const community = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
+                const user = community.find(u => 'real-' + u.email === travelerId);
+                if (user && user.ns) {
+                    return JSON.parse(localStorage.getItem(user.ns + 'ts_following') || '[]').length;
+                }
+            } catch(e) {}
+            return 0;
+        }
+
+        function registerUserInCommunity(email, nombre, avatar) {
+            const ns = getUserNs(email);
+            let community = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
+            const existingIndex = community.findIndex(u => u.email === email);
+            const profile = JSON.parse(localStorage.getItem('travelsense_profile') || '{}');
+            
+            const entry = {
+                email: email,
+                nombre: profile.name || nombre,
+                avatar: profile.avatar || avatar,
+                city: profile.city || 'Desconocido',
+                bio: profile.bio || 'Viajero de TravelSense',
+                budget: profile.budget || 'Medio',
+                travelStyles: profile.travelStyles || [],
+                ns: ns,
+                isReal: true,
+                lastSeen: new Date().toISOString()
+            };
+            
+            if (existingIndex >= 0) {
+                community[existingIndex] = entry;
+            } else {
+                community.push(entry);
+            }
+            localStorage.setItem('ts_community_registry', JSON.stringify(community));
+        }
+
         function logout() {
+            saveCurrentUserData();
             localStorage.removeItem('ts_login');
             window.location.reload();
         }
@@ -1543,14 +1840,15 @@
             // Update Title
             const titles = {
                 'home': 'Dashboard',
-                'users': 'Gestión de Usuarios',
+                'travelers': 'Comunidad de Viajeros',
                 'destinations': 'Catálogo de Destinos',
                 'climatology': 'Predicción Meteorológica',
                 'ai-tools': 'Herramientas de Inteligencia Artificial',
-                'events': 'Agenda de Eventos',
-                'itineraries': 'Itinerarios Generados',
-                'settings': 'Configuración del Sistema',
-                'passport': 'Pasaporte Digital'
+                'events': 'Eventos y Actividades',
+                'itineraries': 'Mis Itinerarios',
+                'settings': 'Configuración',
+                'passport': 'Pasaporte Digital',
+                'profile': 'Mi Perfil'
             };
             document.getElementById('page-title').innerText = titles[viewId] || 'TravelSense';
 
@@ -1562,6 +1860,7 @@
                 if (genBtn) switchAITab('generator', genBtn);
             }
             if (viewId !== 'settings' && viewId !== 'home') loadData(viewId);
+            if (viewId === 'home') { loadData('home'); setTimeout(() => { if (typeof renderHomeWidgets === 'function') renderHomeWidgets(); }, 900); }
 
             // Refresh map if switching to destinations
             if (viewId === 'destinations' && map) {
@@ -1592,21 +1891,24 @@
 
         // Data Loading
         async function loadData(type) {
-            // General stats update, always a good idea
+            // General stats update
             if (typeof updateStats === 'function') updateStats();
+            if (typeof updateUserStats === 'function') updateUserStats();
 
             if (type === 'home' || !type) {
                 fetchDestinations();
-                fetchUsers();
+                if (typeof fetchUsers === 'function') fetchUsers(); // Keep for admin view
                 fetchItineraries();
                 fetchEvents();
             } else {
-                if (type === 'users') fetchUsers();
+                if (type === 'travelers') loadTravelers();
                 if (type === 'destinations') fetchDestinations();
                 if (type === 'events') fetchEvents();
                 if (type === 'itineraries') fetchItineraries();
                 if (type === 'climatology') initClimatology();
+                if (type === 'settings') loadPrivacyToggles();
                 if (type === 'profile') {
+                    setTimeout(initAvatarDrop, 100);
                     renderProfileFavorites();
                     renderProfileItineraries();
                     renderProfileChecklists();
@@ -1711,19 +2013,38 @@
             renderEvents(filtered);
         }
 
-        async function updateStats() {
+        async function updateUserStats() {
             try {
-                const [u, d, i, e] = await Promise.all([
-                    fetch(`${API_BASE}/users`).then(r => r.json()),
-                    fetch(`${API_BASE}/destinations`).then(r => r.json()),
-                    fetch(`${API_BASE}/itineraries`).then(r => r.json()),
-                    fetch(`${API_BASE}/events`).then(r => r.json())
-                ]);
-                document.getElementById('stat-users').innerText = u.length;
-                document.getElementById('stat-dests').innerText = d.length;
-                document.getElementById('stat-itineraries').innerText = i.length;
-                document.getElementById('stat-events').innerText = e.length;
-            } catch (e) { console.log('Error updating stats'); }
+                const visited = JSON.parse(localStorage.getItem('travelsense_visited') || '[]');
+                const favs = JSON.parse(localStorage.getItem('travelsense_favorites') || '[]');
+                const itins = JSON.parse(localStorage.getItem('travelsense_itineraries') || '[]');
+                
+                if (document.getElementById('stat-visited')) document.getElementById('stat-visited').innerText = visited.length;
+                if (document.getElementById('stat-favs')) document.getElementById('stat-favs').innerText = favs.length;
+                if (document.getElementById('stat-my-itins')) document.getElementById('stat-my-itins').innerText = itins.length;
+                
+                const d = await fetch(`${API_BASE}/destinations`).then(r => r.json());
+                if (document.getElementById('stat-dests')) document.getElementById('stat-dests').innerText = d.length;
+                
+                // Populate home recommendations if empty
+                const grid = document.getElementById('home-recommendations-grid');
+                if (grid && d.length && grid.innerHTML.trim() === '<!-- Filled by fetchDestinations -->') {
+                    const shuffled = d.sort(() => 0.5 - Math.random()).slice(0, 3);
+                    grid.innerHTML = shuffled.map(dest => `
+                        <div class="card" onclick="showView('destinos'); setTimeout(()=>showDestinationDetails(${dest.id}), 100)" style="cursor:pointer; padding:15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                            <img src="${dest.imagen_url}" style="width:100%; height:140px; object-fit:cover; border-radius:10px; margin-bottom:12px;">
+                            <h3 style="margin:0 0 5px; font-size:1.1rem; color:var(--text-header)">${dest.nombre}</h3>
+                            <div style="color:var(--text-muted); font-size:0.85rem;"><i class="fas fa-map-marker-alt" style="color:var(--brand-teal)"></i> ${dest.pais}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { console.log('Error updating user stats'); }
+        }
+
+        async function updateStats() {
+            if (typeof updateUserStats === 'function') {
+                updateUserStats();
+            }
         }
 
 
@@ -1826,6 +2147,8 @@
                 const isSpain = d.pais === 'España';
                 const titleColor = isSpain ? 'var(--brand-teal)' : 'var(--brand-orange)';
                 const isFav = userFavs.includes(d.id.toString());
+                const visitedList = getVisitedDestinations();
+                const isVisited = visitedList.some(v => v.id === d.id.toString());
 
                 return `
                 <div class="card" style="height: auto;">
@@ -1843,9 +2166,13 @@
                     <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
                         ${d.descripcion}
                     </p>
-                    <button class="populate-btn favorite-btn-${d.id}" onclick="toggleFavorite('${d.id}', '${d.nombre.replace(/'/g, "\\'")}')" 
-                        style="width:100%; justify-content:center; background:${isFav ? 'rgba(235, 77, 75, 0.1)' : 'transparent'}; border:1px solid ${isFav ? 'var(--brand-orange)' : 'var(--brand-teal)'}; color:${isFav ? 'var(--brand-orange)' : 'var(--brand-teal)'}; box-shadow:none; transition: all 0.3s ease;">
+                    <button class="populate-btn favorite-btn-${d.id}" onclick="toggleFavorite('${d.id}', '${d.nombre.replace(/'/g, "\\'")}', event)" 
+                        style="width:100%; justify-content:center; background:${isFav ? 'rgba(235, 77, 75, 0.1)' : 'transparent'}; border:1px solid ${isFav ? 'var(--brand-orange)' : 'var(--brand-teal)'}; color:${isFav ? 'var(--brand-orange)' : 'var(--brand-teal)'}; box-shadow:none; transition: all 0.3s ease; margin-bottom:8px;">
                         <i class="${isFav ? 'fas fa-heart' : 'far fa-heart'}"></i> <span>${isFav ? 'Quitar de Favoritos' : 'Añadir a Favoritos'}</span>
+                    </button>
+                    <button class="populate-btn visited-btn-${d.id}" onclick="markVisited('${d.id}', '${d.nombre.replace(/'/g, "\\'")}', '${d.region}', event)"
+                        style="width:100%; justify-content:center; background:${isVisited ? 'rgba(0,184,148,0.12)' : 'transparent'}; border:1px solid ${isVisited ? 'var(--brand-teal)' : 'var(--border-color)'}; color:${isVisited ? 'var(--brand-teal)' : 'var(--text-muted)'}; box-shadow:none; transition: all 0.3s ease;">
+                        <i class="${isVisited ? 'fas fa-check-circle' : 'far fa-check-circle'}"></i> <span>${isVisited ? 'Visitado (' + getVisitedYear(d.id) + ')' : 'He estado aquí'}</span>
                     </button>
                 </div>
                 `;
@@ -2632,84 +2959,96 @@
             }
         }
 
-        function generateTrip() {
-            const budget = document.getElementById('gen-budget').value;
-            const company = document.getElementById('gen-company').value;
 
-            if (!window.allDestinations || window.allDestinations.length === 0) {
-                showToast('Esperando datos de destinos...', 'warning');
-                fetchDestinations().then(() => generateTrip()); // Retry after fetch
-                return;
+        // ===== GEMINI AI INTEGRATION =====
+        const GEMINI_API_KEY = "AIzaSyAOgYyjmiz1pp8RYr8MeYCq9JUoVamHEGs"; // Real key
+        
+        async function callGemini(prompt) {
+            const model = "gemini-2.5-flash";
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+            const body = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                console.error("Gemini API error:", res.status, JSON.stringify(errData));
+                throw new Error(`Gemini error ${res.status}: ${errData?.error?.message || res.statusText}`);
             }
-
-            if (selectedVibes.length === 0) {
-                showToast('Selecciona al menos un "Vibe" para el viaje', 'error');
-                return;
+            const data = await res.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) {
+                console.error("Gemini empty response:", JSON.stringify(data));
+                throw new Error("Gemini no devolvio contenido.");
             }
+            return text;
+        }
 
-            const resultDiv = document.getElementById('gen-result');
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `<div class="card" style="text-align:center; padding:40px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br>Analizando ${window.allDestinations.length} destinos...</div>`;
+        async function askHomeGemini() {
+            const input = document.getElementById("home-gemini-input");
+            const result = document.getElementById("home-gemini-result");
+            const text = input?.value?.trim();
+            if (!text) { showToast("Escribe una pregunta primero", "warning"); return; }
+            
+            result.style.display = "block";
+            result.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Pensando con Gemini...`;
+            
+            try {
+                const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
+                const userCtx = profile.name ? `Soy ${profile.name}. ` : "";
+                const answer = await callGemini(`Eres un experto asistente de viajes de TravelSense. ${userCtx}${text}`);
+                result.innerHTML = answer.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\*(.*?)\*/g, "<i>$1</i>");
+            } catch(e) {
+                result.innerHTML = "?? Error conectando con Gemini. Comprueba tu conexi�n.";
+            }
+        }
 
-            // Simulation of AI processing
-            setTimeout(() => {
-                // Simple scoring logic
-                const scores = window.allDestinations.map(d => {
-                    let score = 0;
-                    const desc = d.descripcion + d.clima_tipico + d.nombre;
+        async function generateTrip() {
+            const budget = document.getElementById("gen-budget").value;
+            const company = document.getElementById("gen-company").value;
+            const duration = document.getElementById("gen-duration")?.value || "1 semana";
+            const vibes = selectedVibes.length > 0 ? selectedVibes.join(", ") : "aventura y cultura";
 
-                    // Vibe Matching
-                    if (selectedVibes.includes('Relax') && (desc.includes('Playa') || desc.includes('naturaleza'))) score += 5;
-                    if (selectedVibes.includes('Aventura') && (desc.includes('Montaña') || desc.includes('Desierto'))) score += 5;
-                    if (selectedVibes.includes('Cultura') && (desc.includes('Historia') || desc.includes('Museo') || d.region === 'Europa')) score += 5;
-                    if (selectedVibes.includes('Fiesta') && (desc.includes('nocturna') || desc.includes('Ibiza') || desc.includes('Vegas'))) score += 8;
-                    if (selectedVibes.includes('Gastronomía') && (d.pais === 'España' || d.pais === 'Italia' || d.pais === 'Francia')) score += 5;
+            const resultDiv = document.getElementById("gen-result");
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = `<div class="card" style="text-align:center; padding:40px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini est� dise�ando tu viaje perfecto...</b></div>`;
 
-                    // Budget adjustment (Mock)
-                    if (budget === 'low' && (d.region === 'Asia' || d.region === 'Sudamérica')) score += 3;
-                    if (budget === 'high' && (d.region === 'Norteamérica' || d.region === 'Europa')) score += 3;
+            const budgetLabels = { low: "econ�mico (mochilero)", medium: "est�ndar (confort)", high: "lujo (premium)" };
+            const companyLabels = { solo: "solo", couple: "en pareja", family: "en familia", friends: "con amigos" };
 
-                    return { ...d, score: score + Math.random() * 2 }; // Add randomness
-                });
+            const prompt = `Eres el asistente de viajes IA de TravelSense. Dise�a un itinerario completo y detallado:
+- Duraci�n: ${duration}
+- Presupuesto: ${budgetLabels[budget] || budget}
+- Viajando: ${companyLabels[company] || company}
+- Estilo: ${vibes}
 
-                scores.sort((a, b) => b.score - a.score);
-                const winner = scores[0];
+Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con: Estructura:
+1. Un encabezado h2 con el destino recomendado y pa�s (elige uno espec�fico, no gen�rico)
+2. P�rrafo con por qu� ese destino es perfecto para estas preferencias
+3. Itinerario d�a a d�a en divs con borde izquierdo verde #00B894, emoji por d�a
+4. Secci�n de consejos (presupuesto estimado en euros, mejor �poca, c�mo llegar)
+S� muy espec�fico con lugares, restaurantes y actividades reales.`;
 
-                window.currentItinerary = {
-                    budget: budget,
-                    vibes: selectedVibes,
-                    clima: winner.clima_tipico,
-                    descripcion: winner.descripcion
-                };
-
+            try {
+                const html = await callGemini(prompt);
+                window.lastGeminiItinerary = html;
                 resultDiv.innerHTML = `
-                    <div class="card" style="background: linear-gradient(135deg, rgba(0, 184, 148, 0.1), rgba(0, 184, 148, 0.05)); border: 1px solid var(--brand-teal); height: auto; overflow: visible;">
-                        <div style="text-align:center; margin-bottom:20px;">
-                            <div class="badge" style="background:var(--brand-teal); color:white; font-size:1rem; padding:5px 15px;">¡Destino Ideal Encontrado!</div>
+                    <div id="gen-result-content" style="background:var(--card-bg); border-radius:16px; padding:25px; border:1px solid var(--brand-teal);">
+                        ${html}
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:25px; padding-top:20px; border-top:1px solid var(--border-color);">
+                            <button class="populate-btn" onclick="saveCurrentGeminiItinerary()" style="background:var(--brand-teal); color:white;">
+                                <i class="fas fa-save"></i> Guardar Itinerario
+                            </button>
+                            <button class="populate-btn" onclick="downloadGeminiPDF('gen-result-content', 'Itinerario_TravelSense.pdf')" style="background:transparent; border:1px solid var(--brand-orange); color:var(--brand-orange); box-shadow:none;">
+                                <i class="fas fa-file-pdf"></i> Descargar PDF
+                            </button>
                         </div>
-                        <h2 style="text-align:center; color:var(--text-header); font-size:2.5rem; margin:10px 0;">${winner.nombre}</h2>
-                        <div style="text-align:center; color:var(--text-muted); font-size:1.1rem; margin-bottom:20px;">${winner.pais}</div>
-                        
-                        <p style="text-align:center; max-width:600px; margin:0 auto; line-height:1.6;">
-                            Basado en tu búsqueda de <b>${selectedVibes.join(', ')}</b> con presupuesto <b>${budget}</b>, 
-                            creemos que ${winner.nombre} es perfecto. ${winner.descripcion}
-                        </p>
-
-                        <div style="margin-top:30px; padding:20px; background:white; border-radius:12px; box-shadow:var(--shadow-sm);">
-                            <h4 style="margin-top:0;"><i class="fas fa-list-ul"></i> Itinerario Sugerido (IA)</h4>
-                            <ul style="text-align:left; color:var(--text-muted);">
-                                <li>📅 <b>Día 1:</b> Llegada y tour por el centro histórico.</li>
-                                <li>📷 <b>Día 2:</b> Visita a los puntos más icónicos (Generado según clima: ${winner.clima_tipico}).</li>
-                                <li>🍽️ <b>Día 3:</b> Experiencia gastronómica local.</li>
-                            </ul>
-                        </div>
-                         
-                        <button class="populate-btn" onclick="saveItinerary('${winner.id}', '${winner.nombre}')" style="width:100%; margin-top:20px; justify-content:center;">
-                            <i class="fas fa-save"></i> Guardar Propuesta
-                        </button>
-                    </div>
-                `;
-            }, 1500);
+                    </div>`;
+            } catch(e) {
+                resultDiv.innerHTML = `<div class="card" style="color:#eb4d4b; text-align:center; padding:30px;">?? Error conectando con Gemini. Comprueba tu conexi�n a internet.</div>`;
+            }
         }
 
         function populateComparatorSelects() {
@@ -2840,6 +3179,128 @@
             `;
         }
 
+
+        async function compareDestinationsWithGemini() {
+            const id1 = document.getElementById('comp-dest-1').value;
+            const id2 = document.getElementById('comp-dest-2').value;
+            if (!id1 || !id2) { showToast('Selecciona dos destinos', 'warning'); return; }
+            
+            const d1 = window.allDestinations.find(d => d.id == id1);
+            const d2 = window.allDestinations.find(d => d.id == id2);
+            const prefs = Array.from(document.querySelectorAll('.comp-pref-btn.active')).map(b => b.innerText.split(' ')[0]);
+            
+            const resultDiv = document.getElementById('comp-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<div style="text-align:center; padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini est� analizando ambos destinos...</b></div>`;
+            
+            const prompt = `Eres el comparador de destinos de TravelSense. Compara estos dos destinos de viaje en detalle:
+DESTINO A: ${d1.nombre} (${d1.pais}) - ${d1.descripcion} - Clima: ${d1.clima_tipico}
+DESTINO B: ${d2.nombre} (${d2.pais}) - ${d2.descripcion} - Clima: ${d2.clima_tipico}
+${prefs.length > 0 ? "Preferencias del usuario: " + prefs.join(", ") : ""}
+
+Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con:
+1. Una tabla comparativa (precio estimado, clima, actividades, gastronom�a, facilidad de viaje)
+2. Un an�lisis de cu�l gana seg�n las preferencias indicadas
+3. Una secci�n "El veredicto de Gemini" con un ganador claro y por qu�
+4. Consejos espec�ficos para cada destino`;
+            
+            try {
+                const html = await callGemini(prompt);
+                resultDiv.innerHTML = `
+                    <div style="background:var(--card-bg); border-radius:16px; padding:25px; border:1px solid var(--border-color);">
+                        ${html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")}
+                        <button class="populate-btn" onclick="downloadGeminiPDF('comp-result', 'Comparacion_TravelSense.pdf')" style="margin-top:20px; background:transparent; border:1px solid var(--brand-orange); color:var(--brand-orange);">
+                            <i class="fas fa-file-pdf"></i> Descargar PDF
+                        </button>
+                    </div>`;
+            } catch(e) {
+                resultDiv.innerHTML = `<div style="color:#eb4d4b; text-align:center;">?? Error de conexi�n con Gemini</div>`;
+            }
+        }
+
+        async function generatePackingListWithGemini() {
+            const destId = document.getElementById('pack-dest').value;
+            const dateStr = document.getElementById('pack-date').value;
+            const duration = document.getElementById('pack-duration').value;
+            const type = document.getElementById('pack-type').value;
+            
+            if (!destId || !dateStr) { showToast('Selecciona destino y fecha', 'warning'); return; }
+            
+            const dest = window.allDestinations.find(d => d.id == destId);
+            const packResult = document.getElementById('pack-result');
+            packResult.style.display = 'block';
+            packResult.innerHTML = `<div style="text-align:center; padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini preparando tu lista de equipaje...</b></div>`;
+            
+            const durationLabels = { weekend: 'fin de semana', week: '1 semana', long: '2 semanas o m�s' };
+            const typeLabels = { tourism: 'turismo y relax', business: 'negocios', adventure: 'aventura y trekking' };
+            
+            const prompt = `Eres el asistente de equipaje de TravelSense. Crea una lista de equipaje detallada y personalizada para:
+- Destino: ${dest ? dest.nombre + ' (' + dest.pais + ')' : 'destino'}
+- Fecha: ${dateStr}
+- Duraci�n: ${durationLabels[duration] || duration}
+- Tipo de viaje: ${typeLabels[type] || type}
+- Clima t�pico: ${dest?.clima_tipico || 'variable'}
+
+Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con secciones bien organizadas (ropa, calzado, higiene, electr�nica, documentos, extras espec�ficos del destino). Para cada item incluye un checkbox HTML funcional. Al final a�ade consejos espec�ficos del destino.`;
+            
+            try {
+                const html = await callGemini(prompt);
+                packResult.innerHTML = `
+                    <div id="packing-result-content" style="background:var(--card-bg); border-radius:16px; padding:25px; border:1px solid var(--border-color);">
+                        ${html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")}
+                    </div>
+                    <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
+                        <button class="populate-btn" onclick="saveChecklist('${destId}', '${dest?.nombre || "Viaje"}', '${dateStr}')" style="background:var(--brand-teal); color:white;">
+                            <i class="fas fa-save"></i> Guardar Lista
+                        </button>
+                        <button class="populate-btn" onclick="downloadGeminiPDF('pack-result', 'Equipaje_${dest?.nombre || "TravelSense"}.pdf')" style="background:transparent; border:1px solid var(--brand-orange); color:var(--brand-orange);">
+                            <i class="fas fa-file-pdf"></i> Descargar PDF
+                        </button>
+                    </div>`;
+            } catch(e) {
+                packResult.innerHTML = `<div style="color:#eb4d4b; text-align:center;">?? Error de conexi�n con Gemini</div>`;
+            }
+        }
+
+        async function calculateBudgetWithGemini() {
+            const destId = document.getElementById('calc-dest').value;
+            const days = document.getElementById('calc-days').value;
+            const style = document.getElementById('calc-style').value;
+            const flights = document.getElementById('calc-flights').value;
+            
+            if (!destId) { showToast('Selecciona un destino', 'warning'); return; }
+            
+            const dest = window.allDestinations.find(d => d.id == destId);
+            const calcResult = document.getElementById('calc-result');
+            calcResult.style.display = 'block';
+            calcResult.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Calculando con Gemini...`;
+            
+            const styleLabels = { low: 'mochilero/econ�mico', medium: 'est�ndar/confort', high: 'lujo/premium' };
+            const prompt = `Eres la calculadora de presupuesto de TravelSense. Estima el coste REALISTA de un viaje:
+- Destino: ${dest ? dest.nombre + ' (' + dest.pais + ')' : 'destino'}
+- Duraci�n: ${days} d�as
+- Estilo: ${styleLabels[style] || style}
+- Vuelos: ${flights === 'included' ? 'incluir vuelos desde Espa�a' : 'sin vuelos (ya los tiene)'}
+
+Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con:
+1. Tabla desglosada por categor�as (alojamiento, comida, transporte, actividades, vuelos si aplica, extras)
+2. Total estimado por d�a y total del viaje (en euros)
+3. Consejos para ahorrar en ese destino espec�fico
+4. Rango (m�nimo - m�ximo) para el presupuesto
+
+S� muy espec�fico con los precios reales actuales del destino.`;
+            
+            try {
+                const html = await callGemini(prompt);
+                calcResult.innerHTML = `
+                    <div style="margin-bottom:15px;">${html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")}</div>
+                    <button class="populate-btn" onclick="downloadGeminiPDF('calc-result', 'Presupuesto_${dest?.nombre || "TravelSense"}.pdf')" style="background:transparent; border:1px solid var(--brand-orange); color:var(--brand-orange);">
+                        <i class="fas fa-file-pdf"></i> Descargar PDF
+                    </button>`;
+            } catch(e) {
+                calcResult.innerHTML = `<div style="color:#eb4d4b;">?? Error de conexi�n con Gemini</div>`;
+            }
+        }
         function compareDestinations() {
             const id1 = document.getElementById('comp-dest-1').value;
             const id2 = document.getElementById('comp-dest-2').value;
@@ -3056,85 +3517,252 @@
         loadData('home');
 
         // --- Passport & Gamification Logic ---
-        function renderPassport() {
-            if (!window.allItineraries || !window.allDestinations) {
-                // Retry if data not ready
-                setTimeout(renderPassport, 500);
+
+        function getVisitedDestinations() {
+            return JSON.parse(localStorage.getItem('travelsense_visited') || '[]');
+        }
+
+        function getVisitedYear(destId) {
+            const list = getVisitedDestinations();
+            const entry = list.find(v => v.id === destId.toString());
+            return entry ? entry.year : '';
+        }
+
+        function markVisited(destId, destName, region, evt) {
+            if (evt) evt.stopPropagation();
+            const list = getVisitedDestinations();
+            const idStr = destId.toString();
+            const existing = list.find(v => v.id === idStr);
+            if (existing) {
+                // Already visited: ask to remove
+                if (!confirm('¿Eliminar ' + destName + ' de tu pasaporte?')) return;
+                const newList = list.filter(v => v.id !== idStr);
+                localStorage.setItem('travelsense_visited', JSON.stringify(newList));
+                showToast(destName + ' eliminado del pasaporte', 'info');
+            } else {
+                // Show year picker modal
+                showYearPicker(destId, destName, region);
                 return;
             }
+            renderDestinations(window.allDestinations || []);
+            updateUserStats();
+        }
 
-            // Get unique visited destinations from itineraries
-            const visitedDestIds = [...new Set(window.allItineraries.map(it => it.destino_id))];
-            const visitedDests = window.allDestinations.filter(d => visitedDestIds.includes(d.id));
+        function showYearPicker(destId, destName, region) {
+            const currentYear = new Date().getFullYear();
+            const years = [];
+            for (let y = currentYear; y >= 1960; y--) years.push(y);
+
+            let modal = document.getElementById('year-picker-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'year-picker-modal';
+                modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(6px);';
+                document.body.appendChild(modal);
+            }
+
+            modal.innerHTML = `
+                <div style="background:var(--card-bg); border:var(--glass-border); border-radius:20px; padding:32px; max-width:380px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.4); animation:fadeIn 0.25s;">
+                    <h3 style="margin:0 0 8px; color:var(--text-header);">📍 He estado en ${destName}</h3>
+                    <p style="color:var(--text-muted); margin:0 0 20px; font-size:0.9rem;">¿En qué año visitaste este destino?</p>
+                    <select id="year-picker-select" style="width:100%; padding:12px 16px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:1rem; margin-bottom:20px;">
+                        ${years.map(y => `<option value="${y}">${y}</option>`).join('')}
+                    </select>
+                    <div style="display:flex; gap:12px;">
+                        <button onclick="confirmVisit('${destId}', '${destName.replace(/'/g,"\\'")}', '${region}'); document.getElementById('year-picker-modal').style.display='none';"
+                            style="flex:1; padding:12px; background:var(--brand-teal); color:#fff; border:none; border-radius:10px; cursor:pointer; font-family:inherit; font-weight:600; font-size:0.95rem;">
+                            <i class="fas fa-stamp"></i> Añadir al pasaporte
+                        </button>
+                        <button onclick="document.getElementById('year-picker-modal').style.display='none';"
+                            style="padding:12px 18px; background:transparent; color:var(--text-muted); border:1px solid var(--border-color); border-radius:10px; cursor:pointer; font-family:inherit;">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function confirmVisit(destId, destName, region) {
+            const year = document.getElementById('year-picker-select').value;
+            const list = getVisitedDestinations();
+            list.push({ id: destId.toString(), name: destName, region: region, year: parseInt(year) });
+            localStorage.setItem('travelsense_visited', JSON.stringify(list));
+            showToast('✈️ ' + destName + ' (' + year + ') añadido al pasaporte!', 'success');
+            renderDestinations(window.allDestinations || []);
+            updateUserStats();
+        }
+
+        function renderPassport() {
+            const visitedList = getVisitedDestinations();
 
             // Calculate Stats
-            const totalTrips = visitedDestIds.length; // Use unique destinations as "trips" for now
             let totalKm = 0;
             const regions = new Set();
-
             const MADRID_COORDS = { lat: 40.4168, lon: -3.7038 };
 
-            visitedDests.forEach(d => {
-                regions.add(d.region);
-                if (CITY_COORDS[d.nombre]) {
-                    const dist = haversine(MADRID_COORDS.lat, MADRID_COORDS.lon, CITY_COORDS[d.nombre][0], CITY_COORDS[d.nombre][1]);
-                    totalKm += dist;
+            visitedList.forEach(v => {
+                if (v.region) regions.add(v.region);
+                const d = (window.allDestinations || []).find(d => d.id.toString() === v.id);
+                if (d && CITY_COORDS[d.nombre]) {
+                    totalKm += haversine(MADRID_COORDS.lat, MADRID_COORDS.lon, CITY_COORDS[d.nombre][0], CITY_COORDS[d.nombre][1]);
                 }
             });
 
-            // Update Stats UI
+            const totalTrips = visitedList.length;
+
             animateValue("passport-trips", 0, totalTrips, 1000);
             animateValue("passport-km", 0, Math.round(totalKm), 1500);
             animateValue("passport-regions", 0, regions.size, 1000);
 
-            // Level Logic
             const levelEl = document.getElementById('passport-level');
-            if (totalTrips >= 10) levelEl.textContent = "Ciudadano del Mundo 🌍";
-            else if (totalTrips >= 5) levelEl.textContent = "Explorador Avaezado 🧭";
-            else if (totalTrips >= 1) levelEl.textContent = "Turista Curioso 📷";
-            else levelEl.textContent = "Aspirante a Viajero 🏠";
+            if (levelEl) {
+                if (totalTrips >= 15) levelEl.textContent = "Ciudadano del Mundo 🌐";
+                else if (totalTrips >= 8) levelEl.textContent = "Explorador Avanzado 🧭";
+                else if (totalTrips >= 3) levelEl.textContent = "Turista Curioso 🗺️";
+                else if (totalTrips >= 1) levelEl.textContent = "Viajero Novato 🌱";
+                else levelEl.textContent = "Aspirante a Viajero 🌱";
+            }
 
-            // Render Stamps
             const grid = document.getElementById('passport-stamps-grid');
             const emptyMsg = document.getElementById('passport-empty-msg');
+            if (!grid) return;
 
-            // Clear existing stamps (keep empty msg hidden/shown logic)
-            Array.from(grid.children).forEach(c => {
-                if (c.id !== 'passport-empty-msg') grid.removeChild(c);
-            });
+            Array.from(grid.children).forEach(c => { if (c.id !== 'passport-empty-msg') grid.removeChild(c); });
 
-            if (visitedDests.length === 0) {
-                emptyMsg.style.display = 'block';
+            if (visitedList.length === 0) {
+                if (emptyMsg) emptyMsg.style.display = 'block';
             } else {
-                emptyMsg.style.display = 'none';
+                if (emptyMsg) emptyMsg.style.display = 'none';
 
-                visitedDests.forEach(d => {
-                    const rotation = Math.floor(Math.random() * 20) - 10; // -10 to 10
-                    const colors = ['blue', 'red', 'green', 'purple'];
-                    let color = 'blue';
-                    if (d.region === 'Norteamérica' || d.region === 'Sudamérica') color = 'red';
-                    if (d.region === 'Asia' || d.region === 'Oceanía') color = 'purple';
-                    if (d.region === 'África') color = 'green';
+                // Group by year
+                const byYear = {};
+                visitedList.forEach(v => {
+                    const y = v.year || '?';
+                    if (!byYear[y]) byYear[y] = [];
+                    byYear[y].push(v);
+                });
 
-                    // Simulate date (random past date)
-                    const date = new Date();
-                    date.setDate(date.getDate() - Math.floor(Math.random() * 365));
-                    const dateStr = date.toLocaleDateString();
+                const sortedYears = Object.keys(byYear).sort((a, b) => b - a);
+                sortedYears.forEach(year => {
+                    // Year header stamp
+                    const yearLabel = document.createElement('div');
+                    yearLabel.style.cssText = 'width:100%; text-align:center; margin:16px 0 8px; font-size:0.75rem; letter-spacing:3px; opacity:0.5; text-transform:uppercase;';
+                    yearLabel.textContent = '— ' + year + ' —';
+                    grid.appendChild(yearLabel);
 
-                    const stamp = document.createElement('div');
-                    stamp.className = `stamp ${color} `;
-                    stamp.style.transform = `rotate(${rotation}deg)`;
-                    stamp.innerHTML = `
-                        <div style="font-size:1.2rem; margin-bottom:2px;"><i class="fas fa-plane"></i></div>
-                        <div>${d.nombre.substring(0, 8).toUpperCase()}</div>
-                        <div class="stamp-date">${dateStr}</div>
-                `;
-                    grid.appendChild(stamp);
+                    byYear[year].forEach(v => {
+                        const rotation = Math.floor(Math.random() * 16) - 8;
+                        let color = 'blue';
+                        if (v.region === 'América' || v.region === 'Norteamérica' || v.region === 'Sudamérica') color = 'red';
+                        if (v.region === 'Asia' || v.region === 'Asia y Resto') color = 'purple';
+                        if (v.region === 'África') color = 'green';
+
+                        const stamp = document.createElement('div');
+                        stamp.className = `stamp ${color}`;
+                        stamp.style.transform = `rotate(${rotation}deg)`;
+                        stamp.title = 'Clic para eliminar';
+                        stamp.style.cursor = 'pointer';
+                        stamp.onclick = () => {
+                            if (confirm('¿Eliminar ' + v.name + ' del pasaporte?')) {
+                                const list2 = getVisitedDestinations().filter(x => !(x.id === v.id && x.year === v.year));
+                                localStorage.setItem('travelsense_visited', JSON.stringify(list2));
+                                renderPassport();
+                                renderDestinations(window.allDestinations || []);
+                                updateUserStats();
+                            }
+                        };
+                        stamp.innerHTML = `
+                            <div style="font-size:1.2rem; margin-bottom:2px;"><i class="fas fa-plane"></i></div>
+                            <div>${(v.name || '').substring(0, 8).toUpperCase()}</div>
+                            <div class="stamp-date">${year}</div>
+                        `;
+                        grid.appendChild(stamp);
+                    });
                 });
             }
         }
 
-        function haversine(lat1, lon1, lat2, lon2) {
+        function renderHomeWidgets() {
+            // Update greeting name
+            const profile = JSON.parse(localStorage.getItem('travelsense_profile') || '{}');
+            const nameEl = document.getElementById('home-user-name');
+            if (nameEl && profile.name) nameEl.textContent = profile.name;
+
+            // Favorites widget
+            const favs = getFavorites();
+            const favsList = document.getElementById('home-favs-list');
+            if (favsList) {
+                const dests = (window.allDestinations || []).filter(d => favs.includes(d.id.toString())).slice(0, 5);
+                if (dests.length === 0) {
+                    favsList.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:10px;">Sin favoritos aún.<br><a onclick="showView(\'destinations\')" style="color:var(--brand-teal);cursor:pointer;">Explorar destinos</a></div>';
+                } else {
+                    favsList.innerHTML = dests.map(d => `
+                        <div onclick="showView('destinations')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:var(--glass-border);cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,184,148,0.06)'" onmouseout="this.style.background='transparent'">
+                            <span style="font-size:1.1rem;">📍</span>
+                            <div>
+                                <div style="font-weight:600;color:var(--text-header);font-size:0.88rem;">${d.nombre}</div>
+                                <div style="color:var(--text-muted);font-size:0.75rem;">${d.pais}</div>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+
+            // Visited widget
+            const visited = getVisitedDestinations();
+            const visitedList = document.getElementById('home-visited-list');
+            if (visitedList) {
+                if (visited.length === 0) {
+                    visitedList.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:10px;">Aún no has marcado ningún lugar como visitado.<br><a onclick="showView(\'destinations\')" style="color:var(--brand-teal);cursor:pointer;">Explorar destinos</a></div>';
+                } else {
+                    visitedList.innerHTML = visited.slice(0, 5).map(v => `
+                        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:var(--glass-border);">
+                            <span style="font-size:1.1rem;">✈️</span>
+                            <div>
+                                <div style="font-weight:600;color:var(--text-header);font-size:0.88rem;">${v.name}</div>
+                                <div style="color:var(--text-muted);font-size:0.75rem;">${v.year}</div>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+
+            // Itineraries widget
+            const itins = JSON.parse(localStorage.getItem('travelsense_itineraries') || '[]');
+            const itinsList = document.getElementById('home-itins-list');
+            if (itinsList) {
+                if (itins.length === 0) {
+                    itinsList.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:10px;">Sin itinerarios guardados.<br><a onclick="showView(\'ai-tools\')" style="color:var(--brand-teal);cursor:pointer;">Crear itinerario</a></div>';
+                } else {
+                    itinsList.innerHTML = itins.slice(0, 5).map(it => `
+                        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:var(--glass-border);">
+                            <span style="font-size:1.1rem;">📋</span>
+                            <div>
+                                <div style="font-weight:600;color:var(--text-header);font-size:0.88rem;">${it.destName || 'Destino'}</div>
+                                <div style="color:var(--text-muted);font-size:0.75rem;">${it.duration || '?'} días · ${it.budget || 'estándar'}</div>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+
+            // Destinations widget
+            const destsList = document.getElementById('home-dests-list');
+            if (destsList) {
+                const sample = (window.allDestinations || []).slice(0, 5);
+                if (sample.length === 0) {
+                    destsList.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:10px;">Cargando destinos...</div>';
+                } else {
+                    destsList.innerHTML = sample.map(d => `
+                        <div onclick="showView('destinations')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:var(--glass-border);cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,184,148,0.06)'" onmouseout="this.style.background='transparent'">
+                            <span style="font-size:1.1rem;">🌍</span>
+                            <div>
+                                <div style="font-weight:600;color:var(--text-header);font-size:0.88rem;">${d.nombre}</div>
+                                <div style="color:var(--text-muted);font-size:0.75rem;">${d.pais}</div>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+        }
+function haversine(lat1, lon1, lat2, lon2) {
             const R = 6371; // km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -3561,101 +4189,59 @@
         }
 
         // --- Detail Views for Profile Modals ---
-        function showItineraryDetails(id) {
+                function showItineraryDetails(id) {
             const itineraries = getSavedItineraries();
             const it = itineraries.find(i => i.id === id);
             if (!it) return;
 
-            const modal = document.getElementById('details-modal');
-            const content = document.getElementById('details-modal-content');
+            const modal = document.getElementById("details-modal");
+            const content = document.getElementById("details-modal-content");
 
-            const dest = window.allDestinations ? window.allDestinations.find(d => d.id.toString() === it.destId) : null;
-            const imgStr = dest ? `https://placehold.co/800x400/00b894/ffffff?text=${encodeURIComponent(dest.nombre)}` : '';
+            const isOldVersion = !it.html;
+            let displayHtml = "";
 
-            // Render rich content from the saved details
-            content.innerHTML = `
-                <div style="margin:-30px -30px 20px -30px; height:200px; background:url('${imgStr}') center/cover; position:relative; border-radius:16px 16px 0 0;">
-                    <div style="position:absolute; bottom:20px; left:20px; color:white; text-shadow:1px 1px 3px rgba(0,0,0,0.8);">
-                        <h2 style="margin:0; font-size:2.5rem;">${it.destName}</h2>
-                        <div style="font-size:1.1rem; opacity:0.9;">Guardado el ${it.dateSaved}</div>
+            if (isOldVersion) {
+                const dest = window.allDestinations ? window.allDestinations.find(d => d.id.toString() === it.destId) : null;
+                const imgStr = dest ? `https://placehold.co/800x400/00b894/ffffff?text=${encodeURIComponent(dest.nombre)}` : "";
+                displayHtml = `
+                    <div style="margin:-30px -30px 20px -30px; height:200px; background:url('${imgStr}') center/cover; position:relative; border-radius:16px 16px 0 0;">
+                        <div style="position:absolute; bottom:20px; left:20px; color:white; text-shadow:1px 1px 3px rgba(0,0,0,0.8);">
+                            <h2 style="margin:0; font-size:2.5rem;">${it.destName}</h2>
+                            <div style="font-size:1.1rem; opacity:0.9;">Generado (Versi�n Previa)</div>
+                        </div>
                     </div>
-                </div>
-                
-                <div style="margin-bottom:20px;">
-                    <span class="badge" style="background:var(--brand-teal); color:white;">Presupuesto: ${it.details?.budget || 'Estándar'}</span>
-                    ${it.details?.vibes ? it.details.vibes.map(v => `<span class="badge" style="background:rgba(0,184,148,0.1); color:var(--brand-teal); border:1px solid var(--brand-teal);">${v}</span>`).join(' ') : ''}
-                </div>
-                
-                <h4 style="color:var(--text-header); margin-top:0; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                    <i class="fas fa-list-ul" style="color:var(--brand-teal);"></i> Propuesta de Itinerario
-                </h4>
-                <ul style="text-align:left; color:var(--text-main); font-size:1.05rem; line-height:1.8; list-style-type:none; padding:0;">
-                    <li style="margin-bottom:15px; background:var(--badge-bg); padding:15px; border-radius:8px; border-left:4px solid var(--brand-teal);">
-                        📅 <b style="color:var(--text-header);">Día 1:</b> Llegada y tour por el centro histórico. Aclimatación al ambiente local.
-                    </li>
-                    <li style="margin-bottom:15px; background:var(--badge-bg); padding:15px; border-radius:8px; border-left:4px solid var(--brand-teal);">
-                        📷 <b style="color:var(--text-header);">Día 2:</b> Visita a los puntos más icónicos (Preparado para clima: ${it.details?.clima || 'variable'}). 
-                    </li>
-                    <li style="margin-bottom:15px; background:var(--badge-bg); padding:15px; border-radius:8px; border-left:4px solid var(--brand-teal);">
-                        🍽️ <b style="color:var(--text-header);">Día 3:</b> Experiencia gastronómica local y tiempo libre para explorar rincones ocultos.
-                    </li>
-                </ul>
-                <div style="margin-top:30px; padding:15px; background:rgba(235, 77, 75, 0.05); border-radius:8px; color:var(--text-muted); font-size:0.9rem;">
-                    * Nota: Este itinerario está almacenado permanentemente en tu dispositivo.
-                </div>
-            `;
+                    <div style="padding: 20px; text-align: center; color: var(--brand-orange);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Este itinerario fue generado con una versi�n anterior y no tiene formato avanzado.</p>
+                    </div>
+                `;
+            } else {
+                displayHtml = `<div style="padding: 10px;">${it.html}</div>`;
+            }
 
-            modal.style.display = 'flex';
+            content.innerHTML = displayHtml;
+            modal.style.display = "flex";
         }
 
-        function showChecklistDetails(id) {
+                function showChecklistDetails(id) {
             const checklists = getSavedChecklists();
             const it = checklists.find(c => c.id === id);
             if (!it) return;
 
-            const modal = document.getElementById('details-modal');
-            const content = document.getElementById('details-modal-content');
+            const modal = document.getElementById("details-modal");
+            const content = document.getElementById("details-modal-content");
 
-            let itemsHtml = '';
-            if (it.items && Object.keys(it.items).length > 0) {
-                for (const [category, list] of Object.entries(it.items)) {
-                    itemsHtml += `<div style="margin-bottom:20px;">
-                        <h5 style="margin-bottom:10px; color:var(--brand-orange); font-size:1.1rem; border-bottom:1px solid var(--border-color); padding-bottom:5px;">${category}</h5>
-                        <ul style="list-style:none; padding:0; margin:0;">`;
-
-                    if (Array.isArray(list)) {
-                        list.forEach(item => {
-                            itemsHtml += `<li style="margin-bottom:8px; display:flex; align-items:center;">
-                                <input type="checkbox" style="margin-right:12px; transform:scale(1.2); accent-color:var(--brand-teal);">
-                                <span style="color:var(--text-main); font-size:1rem;">${item}</span>
-                            </li>`;
-                        });
-                    }
-                    itemsHtml += `</ul></div>`;
-                }
+            if (it.html) {
+                content.innerHTML = `<div style="padding: 10px;">${it.html}</div>`;
             } else {
-                itemsHtml = `<p style="color:var(--text-muted); text-align:center; padding: 20px;">Los elementos de esta lista no están disponibles, ya que fue generada en una versión anterior.</p>`;
+                content.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: var(--brand-orange);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Esta checklist fue generada con una versi�n anterior y no se puede mostrar en formato avanzado.</p>
+                    </div>`;
             }
 
-            content.innerHTML = `
-                <div style="text-align:center; padding-bottom:20px; border-bottom:1px solid var(--border-color); margin-bottom:25px;">
-                    <div style="display:inline-block; padding:15px; background:rgba(0,184,148,0.1); border-radius:50%; color:var(--brand-teal); font-size:2rem; margin-bottom:10px;">
-                        <i class="fas fa-suitcase-rolling"></i>
-                    </div>
-                    <h2 style="margin:0; color:var(--text-header);">Equipaje para ${it.destName}</h2>
-                    <div style="color:var(--text-muted); margin-top:5px;">Para el viaje del: <b>${it.dateStr}</b></div>
-                </div>
-                
-                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:20px;">
-                    ${itemsHtml}
-                </div>
-                
-                <button class="populate-btn" onclick="document.getElementById('details-modal').style.display='none'" style="width:100%; margin-top:30px; justify-content:center;">
-                    <i class="fas fa-check"></i> Cerrar Lista
-                </button>
-            `;
-
-            modal.style.display = 'flex';
+            modal.style.display = "flex";
         }
 
         function changeAvatar() {
@@ -3669,6 +4255,8 @@
             // Update Headers & Elements
             const headerName = document.getElementById('header-username');
             if (headerName) headerName.innerText = profile.name;
+            const homeNameEl = document.getElementById('home-user-name');
+            if (homeNameEl && profile.name) homeNameEl.textContent = profile.name;
 
             const profilePageName = document.getElementById('profile-page-name');
             if (profilePageName) profilePageName.innerText = profile.name;
@@ -3683,7 +4271,7 @@
             // Update Welcome Header
             const welcomeHeader = document.getElementById('welcome-header');
             if (welcomeHeader) {
-                welcomeHeader.innerHTML = `<i class="fas fa-sparkles"></i> Bienvenido, ${profile.name}`;
+                welcomeHeader.innerHTML = `<i class="fas fa-sparkles"></i> Bienvenido, <span id="header-welcome-name">${profile.name}</span>`;
             }
 
             // Update Header Avatar globally
@@ -3691,12 +4279,660 @@
             if (headerAvatar) headerAvatar.src = profile.avatar;
         }
 
+        // --- Privacy Toggles ---
+        function getPrivacy() {
+            return JSON.parse(localStorage.getItem('ts_privacy') || '{"favs":true,"itin":true,"passport":true,"check":false}');
+        }
+
+        function savePrivacy() {
+            const p = {
+                favs: document.getElementById('priv-favs') ? document.getElementById('priv-favs').checked : true,
+                itin: document.getElementById('priv-itin') ? document.getElementById('priv-itin').checked : true,
+                passport: document.getElementById('priv-passport') ? document.getElementById('priv-passport').checked : true,
+                check: document.getElementById('priv-check') ? document.getElementById('priv-check').checked : false
+            };
+            localStorage.setItem('ts_privacy', JSON.stringify(p));
+            saveCurrentUserData();
+            showToast('Privacidad actualizada', 'success');
+        }
+
+        function loadPrivacyToggles() {
+            const p = getPrivacy();
+            if (document.getElementById('priv-favs')) document.getElementById('priv-favs').checked = p.favs;
+            if (document.getElementById('priv-itin')) document.getElementById('priv-itin').checked = p.itin;
+            if (document.getElementById('priv-passport')) document.getElementById('priv-passport').checked = p.passport;
+            if (document.getElementById('priv-check')) document.getElementById('priv-check').checked = p.check;
+        }
+
+        // --- Copy Resources ---
+        function copyItinerary(itDataEncoded) {
+            const it = JSON.parse(decodeURIComponent(itDataEncoded));
+            let itins = JSON.parse(localStorage.getItem('travelsense_itineraries') || '[]');
+            if (itins.some(i => i.id === it.id)) {
+                showToast('Este itinerario ya está en tu lista', 'info');
+                return;
+            }
+            itins.push({...it, id: 'copied_' + Date.now()});
+            localStorage.setItem('travelsense_itineraries', JSON.stringify(itins));
+            saveCurrentUserData();
+            showToast('¡Itinerario copiado a tus itinerarios! 🗺️', 'success');
+        }
+
+        function copyChecklist(checkDataEncoded) {
+            const c = JSON.parse(decodeURIComponent(checkDataEncoded));
+            let checks = JSON.parse(localStorage.getItem('travelsense_checklists') || '[]');
+            if (checks.some(x => x.id === c.id)) {
+                showToast('Esta checklist ya está en tu lista', 'info');
+                return;
+            }
+            checks.push({...c, id: 'copied_' + Date.now()});
+            localStorage.setItem('travelsense_checklists', JSON.stringify(checks));
+            saveCurrentUserData();
+            showToast('¡Checklist copiada! ✅', 'success');
+        }
+
+        // --- Travelers Logic ---
+        let allTravelers = [];
+        
+        async function loadTravelers() {
+            const grid = document.getElementById('travelers-grid');
+            if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--brand-teal);"></i><div style="margin-top:10px;color:var(--text-muted);">Cargando viajeros...</div></div>';
+            
+            const myProfile = JSON.parse(localStorage.getItem('travelsense_profile') || 'null');
+            const currEmail = localStorage.getItem('ts_current_user_email') || '';
+            const realTravelers = [];
+            
+            if (myProfile && myProfile.name) {
+                realTravelers.push({
+                    id: 'me', name: myProfile.name,
+                    avatar: myProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(myProfile.name)}&background=00b894&color=fff`,
+                    city: myProfile.city || 'Desconocido', bio: myProfile.bio || 'Viajero de TravelSense',
+                    budget: myProfile.budget || 'Medio', travelStyles: myProfile.travelStyles || [],
+                    visited: (JSON.parse(localStorage.getItem('travelsense_visited') || '[]')).length,
+                    favorites: (JSON.parse(localStorage.getItem('travelsense_favorites') || '[]')).length,
+                    isReal: true, badge: 'Tú'
+                });
+            }
+            
+            const community = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
+            community.forEach(u => {
+                if (u.email === currEmail) return;
+                let v = 0, f = 0;
+                try {
+                    v = JSON.parse(localStorage.getItem(u.ns + 'travelsense_visited') || '[]').length;
+                    f = JSON.parse(localStorage.getItem(u.ns + 'travelsense_favorites') || '[]').length;
+                } catch(e) {}
+                realTravelers.push({
+                    id: 'real-' + u.email, name: u.nombre, avatar: u.avatar,
+                    city: u.city || 'Desconocido', bio: u.bio || 'Viajero de TravelSense',
+                    budget: u.budget || 'Medio', travelStyles: u.travelStyles || [],
+                    visited: v, favorites: f, isReal: true, ns: u.ns, email: u.email
+                });
+            });
+            
+            let apiUsers = [];
+            try {
+                const ctrl = new AbortController();
+                const to = setTimeout(() => ctrl.abort(), 3000);
+                const r = await fetch(`${API_BASE}/users`, {signal: ctrl.signal});
+                clearTimeout(to);
+                apiUsers = await r.json();
+            } catch(e) { apiUsers = []; }
+            
+            const COLORS = ['6c5ce7','e17055','0984e3','fd79a8','a29bfe'];
+            const BIOS = ['Apasionado/a de los viajes.','Mochilero/a con 20+ paises.','Amante de la gastronomía local.','Fan del senderismo y aventura.','Explorador/a urbano/a.'];
+            const realNames = realTravelers.map(r => r.name.toLowerCase());
+            
+            const generated = (Array.isArray(apiUsers) ? apiUsers : []).slice(0, 12)
+                .filter(u => !realNames.includes(u.nombre.toLowerCase()))
+                .map((u, i) => ({
+                    id: 'api-' + u.id, name: u.nombre,
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(u.nombre)}&background=${COLORS[i%5]}&color=fff`,
+                    city: u.pais || 'España', bio: BIOS[i%BIOS.length], budget: 'Medio', travelStyles: [],
+                    visited: Math.floor(Math.random() * 15) + 1, favorites: Math.floor(Math.random() * 10) + 1,
+                    isReal: false
+                }));
+                
+            allTravelers = [...realTravelers, ...generated];
+            
+            try {
+                renderTravelers(allTravelers);
+            } catch(err) {
+                if(grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:30px;"><i class="fas fa-exclamation-triangle" style="color:var(--brand-orange);"></i> Error al cargar viajeros. Recarga la página.</div>';
+            }
+        }
+
+        function filterTravelers() {
+            const term = (document.getElementById('travelers-search')?.value || '').toLowerCase();
+            renderTravelers(allTravelers.filter(t => t.name.toLowerCase().includes(term) || (t.city || '').toLowerCase().includes(term)));
+        }
+
+        // Global map to hold traveler objects for the click handler
+        window.travelerClickMap = {};
+
+        function renderTravelers(list) {
+            const grid = document.getElementById('travelers-grid');
+            if (!grid) return;
+            if (!list.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:30px;">No se encontraron viajeros.</div>';
+                return;
+            }
+            
+            window.travelerClickMap = {};
+            
+            grid.innerHTML = list.map(t => {
+                window.travelerClickMap[t.id] = t; // Store safely without quotes breaking HTML
+                
+                const following = isFollowing(t.id);
+                const isMe = t.id === 'me';
+                const styles = (t.travelStyles || []).map(s => `<span class="badge" style="background:rgba(0,184,148,0.1);color:var(--brand-teal);border:1px solid rgba(0,184,148,0.3);font-size:0.72rem;">${s}</span>`).join('');
+                
+                return `
+                <div class="card" style="height:auto; text-align:center; position:relative; cursor:pointer; transition:transform 0.2s; ${t.isReal ? 'border:2px solid var(--brand-teal);' : ''}" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                    <div style="position:absolute; top:10px; right:10px; text-align:right; line-height:1.2;">
+                        <div style="font-size:0.78rem; font-weight:700; color:var(--text-header);">${getFollowerCount(t.id)} <span style="font-size:0.65rem; color:var(--text-muted); font-weight:400;">seg.</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">${getFollowingCount(t.id)} siguiendo</div>
+                    </div>
+                    ${isMe ? '<div style="position:absolute; top:10px; left:10px; background:var(--brand-teal); color:white; padding:2px 7px; border-radius:20px; font-size:0.68rem; font-weight:700;">Tú</div>' : ''}
+                    
+                    <div onclick="showTravelerProfile(window.travelerClickMap['${t.id}'])">
+                        <img src="${t.avatar}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:3px solid ${t.isReal ? 'var(--brand-teal)' : 'var(--border-color)'}; margin:8px auto 10px; display:block;">
+                        <h3 style="margin:0 0 3px; color:var(--text-header); font-size:1rem;">${t.name}</h3>
+                        <div style="color:var(--text-muted); font-size:0.82rem; margin-bottom:6px;"><i class="fas fa-map-marker-alt" style="color:var(--brand-teal);"></i> ${t.city}</div>
+                        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:10px; max-height:44px; overflow:hidden;">${t.bio}</p>
+                        
+                        <div style="display:flex; justify-content:center; gap:14px; margin-bottom:10px;">
+                            <div><div style="font-size:1rem; font-weight:700; color:var(--brand-orange);">${t.visited || 0}</div><div style="font-size:0.68rem; color:var(--text-muted);">Visitados</div></div>
+                            <div><div style="font-size:1rem; font-weight:700; color:var(--brand-teal);">${t.favorites || 0}</div><div style="font-size:0.68rem; color:var(--text-muted);">Favoritos</div></div>
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-bottom:10px;">${styles}</div>
+                    </div>
+                    
+                    ${!isMe ? 
+                    `<button class="populate-btn" onclick="event.stopPropagation();toggleFollow('${t.id}', '${t.name.replace(/'/g, "\\'")}')" style="width:100%; justify-content:center; font-size:0.8rem; background:${following ? 'rgba(235,77,75,0.1)' : 'transparent'}; border:1px solid ${following ? 'var(--brand-orange)' : 'var(--brand-teal)'}; color:${following ? 'var(--brand-orange)' : 'var(--brand-teal)'}; box-shadow:none; padding:7px;">
+                        <i class="fas ${following ? 'fa-user-minus' : 'fa-user-plus'}"></i> ${following ? 'Dejar de seguir' : 'Seguir'}
+                    </button>` 
+                    : 
+                    `<button class="populate-btn" onclick="event.stopPropagation();showView('profile')" style="width:100%; justify-content:center; font-size:0.8rem; background:transparent; border:1px solid var(--brand-teal); color:var(--brand-teal); box-shadow:none; padding:7px;">
+                        <i class="fas fa-edit"></i> Mi Perfil
+                    </button>`}
+                </div>`;
+            }).join('');
+        }
+
+        function showTravelerProfile(traveler) {
+            const modal = document.getElementById('details-modal');
+            const content = document.getElementById('details-modal-content');
+            const following = isFollowing(traveler.id);
+            const isMe = traveler.id === 'me';
+            const ns = traveler.ns || null;
+            const priv = isMe ? {favs:true,itin:true,passport:true,check:true} : getPrivacy();
+
+            // Resolve data sources: real namespace data, or current user data (me), or empty (generated)
+            const activeFavs = isMe ? getFavorites() : (ns ? JSON.parse(localStorage.getItem(ns+'travelsense_favorites')||'[]') : []);
+            const activeVisited = isMe ? getVisitedDestinations() : (ns ? JSON.parse(localStorage.getItem(ns+'travelsense_visited')||'[]') : []);
+            const activeItins = isMe ? getSavedItineraries() : (ns ? JSON.parse(localStorage.getItem(ns+'travelsense_itineraries')||'[]') : []);
+            const activeChecks = isMe ? getSavedChecklists() : (ns ? JSON.parse(localStorage.getItem(ns+'travelsense_checklists')||'[]') : []);
+
+            const locked = '<div style="text-align:center;padding:30px;color:var(--text-muted);"><i class="fas fa-lock" style="font-size:2rem;opacity:0.4;display:block;margin-bottom:10px;"></i>Contenido privado</div>';
+
+            function buildFavoritesHtml() {
+                if (!priv.favs && !isMe) return locked;
+                const dests = (window.allDestinations||[]).filter(d => activeFavs.includes(d.id.toString()));
+                if (!dests.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Sin favoritos guardados.</p>';
+                return '<div class="dashboard-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">' + dests.map(d => `
+                    <div class="card" style="height:auto;padding:12px;">
+                        <div style="font-weight:700;color:var(--brand-teal);margin-bottom:4px;font-size:0.95rem;">${d.nombre}</div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;"><i class="fas fa-globe"></i> ${d.pais}</div>
+                        ${!isMe ? `<button class="populate-btn" onclick="if(!getFavorites().includes('${d.id}'.toString()))toggleFavorite('${d.id}','${d.nombre.replace(/'/g,"\\'")}');" style="width:100%;justify-content:center;background:transparent;border:1px solid var(--brand-teal);color:var(--brand-teal);box-shadow:none;font-size:0.75rem;padding:5px;"><i class="fas fa-heart"></i> Guardar en mis favs</button>` : ''}
+                    </div>`).join('') + '</div>';
+            }
+
+            function buildItinHtml() {
+                if (!priv.itin && !isMe) return locked;
+                if (!activeItins.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Sin itinerarios guardados.</p>';
+                return activeItins.map(it => `
+                    <div style="background:var(--badge-bg);border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid var(--brand-teal);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <b style="color:var(--text-header);">${it.destName}</b>
+                            <span class="badge" style="background:var(--brand-teal);color:white;border:none;">${it.duration||'?'} dias</span>
+                        </div>
+                        <div style="color:var(--text-muted);font-size:0.82rem;margin-bottom:8px;"><i class="fas fa-tag"></i> ${it.budget||'estandar'}</div>
+                        <div style="display:flex;gap:6px;">
+                            ${isMe ? `<button class="populate-btn" onclick="showItineraryDetails('${it.id}')" style="flex:1;justify-content:center;background:transparent;border:1px solid var(--border-color);color:var(--text-main);box-shadow:none;font-size:0.78rem;padding:5px;"><i class="fas fa-eye"></i> Ver</button>` : ''}
+                            ${isMe && it.htmlContent ? `<button class="populate-btn" onclick="downloadGeminiPDF('saved-itin-print-${it.id}','TravelSense_${it.destName}.pdf')" style="background:transparent;border:1px solid var(--brand-orange);color:var(--brand-orange);box-shadow:none;font-size:0.78rem;padding:5px 8px;"><i class="fas fa-file-pdf"></i></button>` : ''}
+                        </div>
+                    </div>`).join('');
+            }
+
+            function buildPassportHtml() {
+                if (!priv.passport && !isMe) return locked;
+                if (!activeVisited.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Pasaporte vacio.</p>';
+                const totalKm = activeVisited.reduce((acc,v) => {
+                    const d = (window.allDestinations||[]).find(d=>d.id.toString()===v.id);
+                    return acc + (d && d.latitud ? Math.round(Math.hypot((d.latitud||0)-40.4168,(d.longitud||0)+3.7038)*111) : 500);
+                }, 0);
+                return `<div style="background:linear-gradient(135deg,#0a2540,#1a4a7a);border-radius:14px;padding:22px;color:white;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <div><div style="font-size:0.65rem;letter-spacing:3px;opacity:0.6;">TRAVELSENSE PASSPORT</div><div style="font-size:1.2rem;font-weight:700;">${traveler.name}</div></div>
+                        <div style="text-align:right;"><div style="font-size:1.8rem;">🛂</div><div style="font-size:0.75rem;opacity:0.7;">${activeVisited.length} sellos</div></div>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-bottom:16px;">
+                        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;text-align:center;flex:1;"><div style="font-size:1.2rem;font-weight:700;">${activeVisited.length}</div><div style="font-size:0.7rem;opacity:0.7;">Destinos</div></div>
+                        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;text-align:center;flex:1;"><div style="font-size:1.2rem;font-weight:700;">${totalKm.toLocaleString()}</div><div style="font-size:0.7rem;opacity:0.7;">km viajados</div></div>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                        ${activeVisited.map(v=>`<div style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:6px 10px;text-align:center;"><div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;">${(v.name||'').substring(0,10).toUpperCase()}</div><div style="font-size:0.6rem;opacity:0.7;">${v.year}</div></div>`).join('')}
+                    </div>
+                </div>`;
+            }
+
+            function buildCheckHtml() {
+                if (!priv.check && !isMe) return locked;
+                if (!activeChecks.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Sin checklists guardadas.</p>';
+                return activeChecks.map(c => `
+                    <div style="background:var(--badge-bg);border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid var(--brand-orange);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <b style="color:var(--text-header);">${c.destName}</b>
+                            <span class="badge" style="background:rgba(225,112,85,0.1);color:var(--brand-orange);border:1px solid var(--brand-orange);"><i class="far fa-calendar"></i> ${c.dateStr}</span>
+                        </div>
+                        <div style="display:flex;gap:6px;">
+                            ${isMe ? `<button class="populate-btn" onclick="showChecklistDetails('${c.id}')" style="flex:1;justify-content:center;background:transparent;border:1px solid var(--border-color);color:var(--text-main);box-shadow:none;font-size:0.78rem;padding:5px;"><i class="fas fa-eye"></i> Ver</button>` : ''}
+                        </div>
+                    </div>`).join('');
+            }
+
+            content.innerHTML = `
+                <div style="display:flex;align-items:start;gap:16px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border-color);flex-wrap:wrap;">
+                    <img src="${traveler.avatar}" style="width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid ${traveler.isReal?'var(--brand-teal)':'var(--border-color)'};">
+                    <div style="flex:1;min-width:160px;">
+                        <h2 style="margin:0 0 3px;color:var(--text-header);font-size:1.2rem;">${traveler.name}</h2>
+                        <div style="color:var(--text-muted);font-size:0.83rem;margin-bottom:5px;"><i class="fas fa-map-marker-alt" style="color:var(--brand-teal);"></i> ${traveler.city}</div>
+                        <p style="margin:0 0 8px;color:var(--text-muted);font-size:0.85rem;">${traveler.bio}</p>
+                        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                            <span style="font-size:0.83rem;"><b style="color:var(--text-header);">${getFollowerCount(traveler.id)}</b> <span style="color:var(--text-muted);">seguidores</span></span>
+                            <span style="font-size:0.83rem;"><b style="color:var(--text-header);">${getFollowingCount(traveler.id)}</b> <span style="color:var(--text-muted);">siguiendo</span></span>
+                        </div>
+                    </div>
+                    ${!isMe ? `<button class="populate-btn" onclick="toggleFollow('${traveler.id}','${traveler.name}');document.getElementById('details-modal').style.display='none';" style="background:${following?'rgba(235,77,75,0.1)':'transparent'};border:1px solid ${following?'var(--brand-orange)':'var(--brand-teal)'};color:${following?'var(--brand-orange)':'var(--brand-teal)'};box-shadow:none;padding:7px 14px;font-size:0.85rem;"><i class="fas ${following?'fa-user-minus':'fa-user-plus'}"></i> ${following?'Dejar de seguir':'Seguir'}</button>` : ''}
+                </div>
+                <div style="display:flex;gap:6px;border-bottom:1px solid var(--border-color);margin-bottom:16px;flex-wrap:wrap;padding-bottom:6px;">
+                    <button class="filter-btn active" onclick="switchTravelerTab('fav',this)" style="font-size:0.8rem;"><i class="fas fa-heart"></i> Favoritos</button>
+                    <button class="filter-btn" onclick="switchTravelerTab('itin',this)" style="font-size:0.8rem;"><i class="fas fa-route"></i> Itinerarios</button>
+                    <button class="filter-btn" onclick="switchTravelerTab('passport',this)" style="font-size:0.8rem;"><i class="fas fa-passport"></i> Pasaporte</button>
+                    <button class="filter-btn" onclick="switchTravelerTab('check',this)" style="font-size:0.8rem;"><i class="fas fa-clipboard-check"></i> Checklists</button>
+                </div>
+                <div id="tp-fav" class="traveler-tab">${buildFavoritesHtml()}</div>
+                <div id="tp-itin" class="traveler-tab" style="display:none;">${buildItinHtml()}</div>
+                <div id="tp-passport" class="traveler-tab" style="display:none;">${buildPassportHtml()}</div>
+                <div id="tp-check" class="traveler-tab" style="display:none;">${buildCheckHtml()}</div>
+            `;
+            modal.style.display = 'flex';
+        }
+        function switchTravelerTab(tab, btn) {
+            document.querySelectorAll('#details-modal-content .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.traveler-tab').forEach(t => t.style.display = 'none');
+            const el = document.getElementById('tp-' + tab);
+            if(el) el.style.display = 'block';
+        }
+
+        // --- Auth Handle ---
+        function handleCredentialResponse(response) {
+            fetch(`${API_BASE}/auth/google`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ credential: response.credential }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                
+                document.getElementById('login-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('login-overlay').style.display = 'none', 500);
+                
+                const avatar = data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.nombre)}&background=00b894&color=fff`;
+                
+                // Account Isolation Check
+                const prevEmail = localStorage.getItem('ts_current_user_email');
+                const currEmail = data.email || data.nombre;
+                
+                if (currEmail !== prevEmail) {
+                    if (prevEmail) saveCurrentUserData();
+                    USER_DATA_KEYS.forEach(k => localStorage.removeItem(k));
+                    loadUserData(currEmail);
+                } else {
+                    loadUserData(currEmail);
+                }
+                
+                localStorage.setItem('ts_current_user_email', currEmail);
+                localStorage.setItem('ts_login', 'true');
+                
+                // Apply profile
+                const savedProfile = JSON.parse(localStorage.getItem('travelsense_profile') || 'null');
+                if (savedProfile && savedProfile.name) {
+                    updateUIWithProfile(savedProfile);
+                } else {
+                    updateUIWithProfile({ name: data.nombre, avatar: avatar });
+                }
+                
+                loadUserProfile();
+                loadPrivacyToggles();
+                registerUserInCommunity(currEmail, data.nombre, data.avatar);
+                loadData();
+                
+                const isNewUser = !localStorage.getItem('ts_onboarding_done');
+                if (isNewUser) {
+                    setTimeout(() => showOnboarding(data.nombre), 600);
+                } else {
+                    showToast(`Bienvenido de nuevo, ${data.nombre}! 🌍`, 'success');
+                    if (typeof updateUserStats === 'function') updateUserStats();
+                    fetchDestinations();
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                showToast('Error de conexión con el servidor', 'error');
+            });
+        }
+
+        // --- AI Chatbot Logic ---
+        function toggleChat() {
+            const w = document.getElementById('chat-window');
+            w.style.display = w.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const msgs = document.getElementById('chat-messages');
+            msgs.innerHTML += `<div class="msg user">${text}</div>`;
+            input.value = '';
+            msgs.scrollTop = msgs.scrollHeight;
+
+            // Loading indicator
+            const loadingId = 'load-' + Date.now();
+            msgs.innerHTML += `<div class="msg bot" id="${loadingId}"><i class="fas fa-ellipsis-h fa-fade"></i></div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+
+            try {
+                const res = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pregunta: text })
+                });
+                const data = await res.json();
+                document.getElementById(loadingId).remove();
+                
+                if (data.respuesta) {
+                    msgs.innerHTML += `<div class="msg bot">${data.respuesta.replace(/\n/g, '<br>')}</div>`;
+                } else {
+                    msgs.innerHTML += `<div class="msg bot" style="color:var(--brand-orange)">Error: No hay respuesta del modelo.</div>`;
+                }
+            } catch (err) {
+                if (document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                msgs.innerHTML += `<div class="msg bot" style="color:var(--brand-orange)">Error de conexión con el Asistente IA.</div>`;
+            }
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+        
+        function loginAsGuest() {
+            handleCredentialResponse({
+                credential: 'simulated_guest_token',
+                isGuest: true
+            });
+        }
+
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             loadUserProfile();
-            // ... existing init logic ...
+            if (typeof updateUserStats === 'function') updateUserStats();
+            fetchDestinations();
         });
-    </script>
-</body>
+    
+        function switchItinTab(tab, btn) {
+            document.querySelectorAll("#itineraries .filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const exp = document.getElementById("itin-explore-view");
+            const sav = document.getElementById("itin-saved-view");
+            if(exp) exp.style.display = (tab === "explore") ? "block" : "none";
+            if(sav) sav.style.display = (tab === "saved") ? "block" : "none";
+            if (tab === "saved") renderSavedItineraries();
+        }
 
+        function renderSavedItineraries() {
+            const grid = document.getElementById("itineraries-saved-list") || document.getElementById("profile-itineraries-list");
+            if (!grid) return;
+            const items = getSavedItineraries();
+            if (!items.length) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;opacity:0.5;"><p>No hay itinerarios guardados.</p></div>`;
+                return;
+            }
+            grid.innerHTML = items.map(it => `
+                <div class="card">
+                    <div class="card-title">${it.destName}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Guardado el ${it.dateSaved}</div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="populate-btn" onclick="showItineraryDetails('${it.id}')">Ver Detalle</button>
+                        <button class="populate-btn" style="background:transparent;border:1px solid #eb4d4b;color:#eb4d4b;" onclick="deleteSavedItinerary('${it.id}')">Eliminar</button>
+                    </div>
+                </div>
+            `).join("");
+        }
+        
+        function deleteSavedItinerary(id) {
+            if (!confirm("�Seguro que quieres eliminar este itinerario?")) return;
+            let items = getSavedItineraries();
+            items = items.filter(it => it.id !== id);
+            localStorage.setItem("travelsense_itineraries", JSON.stringify(items));
+            renderSavedItineraries();
+            showToast("Itinerario eliminado", "info");
+        }
+
+        // ===== ONBOARDING =====
+        function showOnboarding(nombre) {
+            const modal = document.getElementById("onboarding-modal");
+            if (modal) {
+                modal.style.display = "flex";
+                const nameInput = document.getElementById("ob-name");
+                if (nameInput && nombre) nameInput.value = nombre;
+            }
+        }
+
+        function completeOnboarding() {
+            const name = document.getElementById("ob-name")?.value?.trim();
+            const city = document.getElementById("ob-city")?.value?.trim();
+            const budget = document.getElementById("ob-budget")?.value;
+            const styles = Array.from(document.querySelectorAll(".ob-style-btn.active")).map(b => b.innerText.trim());
+            
+            if (!name) { showToast("Escribe tu nombre", "warning"); return; }
+            
+            const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
+            profile.name = name;
+            profile.city = city || "N�mada Digital";
+            profile.budget = budget;
+            profile.travelStyles = styles;
+            localStorage.setItem("travelsense_profile", JSON.stringify(profile));
+            localStorage.setItem("ts_onboarding_done", "true");
+            
+            saveCurrentUserData();
+            loadUserProfile();
+            document.getElementById("onboarding-modal").style.display = "none";
+            showToast(`�Bienvenido, ${name}! Todo listo ??`, "success");
+        }
+
+        // ===== PRIVACY TOGGLES =====
+        function savePrivacy() {
+            const privacy = {
+                showFavs: document.getElementById("priv-favs")?.checked !== false,
+                showItin: document.getElementById("priv-itin")?.checked !== false,
+                showPassport: document.getElementById("priv-passport")?.checked !== false,
+                showChecklist: document.getElementById("priv-check")?.checked === true
+            };
+            localStorage.setItem("ts_privacy", JSON.stringify(privacy));
+            saveCurrentUserData();
+        }
+
+        function loadPrivacyToggles() {
+            const privacy = JSON.parse(localStorage.getItem("ts_privacy") || "{}");
+            const set = (id, val) => { const el = document.getElementById(id); if(el) el.checked = val !== false; };
+            set("priv-favs", privacy.showFavs !== false);
+            set("priv-itin", privacy.showItin !== false);
+            set("priv-passport", privacy.showPassport !== false);
+            set("priv-check", privacy.showChecklist === true);
+        }
+
+        // ===== DELETE ACCOUNT =====
+        function deleteAccount() {
+            if (!confirm("?? �SEGURO? Se borrar�n TODOS tus datos de este dispositivo. Esta acci�n no se puede deshacer.")) return;
+            const email = localStorage.getItem("ts_current_user_email");
+            if (email) {
+                const ns = getUserNs(email);
+                USER_DATA_KEYS.forEach(k => { localStorage.removeItem(ns + k); localStorage.removeItem(k); });
+                let reg = JSON.parse(localStorage.getItem("ts_community_registry") || "[]");
+                localStorage.setItem("ts_community_registry", JSON.stringify(reg.filter(u => u.email !== email)));
+            }
+            localStorage.removeItem("ts_login");
+            localStorage.removeItem("ts_current_user_email");
+            showToast("Cuenta eliminada", "info");
+            setTimeout(() => window.location.reload(), 1500);
+        }
+
+        // ===== PROFILE AVATAR DRAG & DROP =====
+        function initAvatarDrop() {
+            const zone = document.getElementById("avatar-drop-zone");
+            if (!zone) return;
+            zone.addEventListener("dragover", e => { e.preventDefault(); zone.style.borderColor = "var(--brand-teal)"; });
+            zone.addEventListener("dragleave", () => { zone.style.borderColor = "var(--border-color)"; });
+            zone.addEventListener("drop", e => {
+                e.preventDefault();
+                zone.style.borderColor = "var(--border-color)";
+                const file = e.dataTransfer.files[0];
+                if (!file || !file.type.startsWith("image/")) { showToast("Solo im�genes", "error"); return; }
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const src = ev.target.result;
+                    const preview = document.getElementById("profile-avatar-preview");
+                    if (preview) preview.src = src;
+                    const headerAvatar = document.getElementById("header-avatar");
+                    if (headerAvatar) headerAvatar.src = src;
+                    // Save to profile
+                    const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
+                    profile.avatar = src;
+                    localStorage.setItem("travelsense_profile", JSON.stringify(profile));
+                    saveCurrentUserData();
+                    showToast("Foto actualizada ?", "success");
+                };
+                reader.readAsDataURL(file);
+            });
+            // Also allow click to select file
+            zone.addEventListener("click", () => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = "image/*";
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        const src = ev.target.result;
+                        const preview = document.getElementById("profile-avatar-preview");
+                        if (preview) preview.src = src;
+                        const headerAvatar = document.getElementById("header-avatar");
+                        if (headerAvatar) headerAvatar.src = src;
+                        const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
+                        profile.avatar = src;
+                        localStorage.setItem("travelsense_profile", JSON.stringify(profile));
+                        saveCurrentUserData();
+                        showToast("Foto actualizada ?", "success");
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            });
+        }
+
+        // ===== USER STATS UPDATE =====
+        function updateUserStats() {
+            const visited = (typeof getVisitedDestinations === "function" ? getVisitedDestinations() : JSON.parse(localStorage.getItem("travelsense_visited") || "[]")).length;
+            const favs = JSON.parse(localStorage.getItem("travelsense_favorites") || "[]").length;
+            const itins = JSON.parse(localStorage.getItem("travelsense_itineraries") || "[]").length;
+            const dests = window.allDestinations?.length || "-";
+            
+            const set = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+            set("stat-visited", visited);
+            set("stat-favs", favs);
+            set("stat-my-itins", itins);
+            set("stat-dests", dests);
+        }
+
+    </script>
+
+
+    <!-- Onboarding Modal -->
+    <div id="onboarding-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:99998; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+        <div style="background:linear-gradient(135deg, #0E2A47, #051525); border:1px solid rgba(255,215,0,0.3); border-radius:24px; padding:40px; max-width:500px; width:90%; color:white; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+            <div style="text-align:center; margin-bottom:30px;">
+                <i class="fas fa-globe-americas" style="font-size:3rem; color:#FFD700; margin-bottom:15px;"></i>
+                <h2 style="margin:0; color:#FFD700; font-size:2rem;">�Bienvenido a TravelSense!</h2>
+                <p style="color:rgba(255,255,255,0.7); margin:10px 0 0;">Cu�ntanos un poco sobre ti para personalizar tu experiencia</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:15px;">
+                <div>
+                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:5px; display:block;">�C�mo te gustar�a que te llamemos?</label>
+                    <input id="ob-name" type="text" placeholder="Tu nombre..." style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:white; font-family:inherit; outline:none; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:5px; display:block;">Ciudad de origen</label>
+                    <input id="ob-city" type="text" placeholder="Ej: Madrid, Barcelona..." style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:white; font-family:inherit; outline:none; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:8px; display:block;">Estilo de viaje preferido</label>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">??? Playa</button>
+                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">?? Monta�a</button>
+                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">??? Cultura</button>
+                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">?? Aventura</button>
+                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">??? Gastronom�a</button>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:5px; display:block;">Presupuesto habitual</label>
+                    <select id="ob-budget" style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(14,42,71,0.8); color:white; font-family:inherit; outline:none;">
+                        <option value="low">?? Econ�mico (Mochilero)</option>
+                        <option value="medium" selected>?? Est�ndar (Confort)</option>
+                        <option value="high">?? Lujo (Premium)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="populate-btn" onclick="completeOnboarding()" style="width:100%; justify-content:center; margin-top:25px; background:linear-gradient(135deg,#FFD700,#FF9F43); color:#000; font-weight:700; font-size:1.1rem; padding:15px;">
+                <i class="fas fa-rocket"></i> �Empezar a Explorar!
+            </button>
+        </div>
+    </div>
+    <!-- Floating Chatbot UI -->
+    <div class="chat-widget">
+        <div class="chat-window" id="chat-window">
+            <div class="chat-header">
+                <span><i class="fas fa-robot"></i> TravelSense AI</span>
+                <i class="fas fa-times" style="cursor:pointer" onclick="toggleChat()"></i>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg bot">¡Hola! Soy tu asistente de viajes inteligente. ¿A dónde te gustaría viajar o qué dudas tienes sobre tu próximo destino?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Pregunta algo..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button class="chat-send" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button class="chat-btn" onclick="toggleChat()">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+    </div>
+</body>
 </html>
