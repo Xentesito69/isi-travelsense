@@ -1,248 +1,5 @@
 ﻿        <!-- Itineraries View -->
-        <section id="itineraries" class="view-section">
-            <!-- Tabs -->
-            <div class="tabs" style="margin-bottom:24px; display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="filter-btn active" id="itin-tab-plan" onclick="switchItinTab('plan', this)">
-                    <i class="fas fa-route" style="margin-right:6px;"></i>Planificar Viaje
-                </button>
-                <button class="filter-btn" id="itin-tab-saved" onclick="switchItinTab('saved', this)">
-                    <i class="fas fa-bookmark" style="margin-right:6px;"></i>Mis Itinerarios Guardados
-                </button>
-                <button class="filter-btn" id="itin-tab-explore" onclick="switchItinTab('explore', this)">
-                    <i class="fas fa-globe" style="margin-right:6px;"></i>Explorar de la Comunidad
-                </button>
-            </div>
-
-            <!-- TAB: PLAN -->
-            <div id="itin-plan-view">
-                <!-- Step 1: Pick destination -->
-                <div id="itin-step1">
-                    <div style="margin-bottom:20px;">
-                        <h3 style="margin:0 0 6px; color:var(--text-header);">¿A dónde quieres ir?</h3>
-                        <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">Selecciona un destino para generar tu itinerario personalizado con IA</p>
-                    </div>
-                    <div class="search-container" style="margin-bottom:20px;">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="itin-dest-search" class="search-input" placeholder="Buscar destino..." oninput="filterItinDestinations()">
-                    </div>
-                    <div id="itin-dest-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
-                        <!-- Filled by renderItinDestinations() -->
-                        <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">
-                            <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; margin-bottom:10px;"></i>
-                            <p>Cargando destinos...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Configure & Generate -->
-                <div id="itin-step2" style="display:none;">
-                    <button onclick="backToItinStep1()" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-family:inherit; font-size:0.9rem; padding:0; margin-bottom:20px; display:flex; align-items:center; gap:6px;">
-                        <i class="fas fa-arrow-left"></i> Volver a destinos
-                    </button>
-
-                    <div style="display:grid; grid-template-columns:320px 1fr; gap:24px; align-items:start;">
-                        <!-- Config Panel -->
-                        <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:24px; box-shadow:var(--shadow-sm); position:sticky; top:20px;">
-                            <div id="itin-selected-dest-header" style="margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border-color);">
-                                <!-- Filled dynamically -->
-                            </div>
-
-                            <div style="display:flex; flex-direction:column; gap:14px;">
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Duración del viaje</label>
-                                    <select id="itin-duration" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem;">
-                                        <option value="fin de semana (2-3 días)">Fin de semana (2-3 días)</option>
-                                        <option value="semana corta (4-5 días)">Semana corta (4-5 días)</option>
-                                        <option value="una semana (7 días)" selected>Una semana (7 días)</option>
-                                        <option value="10 días">10 días</option>
-                                        <option value="dos semanas (14 días)">Dos semanas (14 días)</option>
-                                        <option value="tres semanas">Tres semanas</option>
-                                        <option value="un mes">Un mes</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Presupuesto</label>
-                                    <select id="itin-budget" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem;">
-                                        <option value="mochilero (muy económico)">🎒 Mochilero</option>
-                                        <option value="económico" selected>💰 Económico</option>
-                                        <option value="moderado">💳 Moderado</option>
-                                        <option value="confort">⭐ Confort</option>
-                                        <option value="lujo">✨ Lujo</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Viajas con</label>
-                                    <select id="itin-company" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem;">
-                                        <option value="solo">Solo</option>
-                                        <option value="en pareja" selected>En pareja</option>
-                                        <option value="con amigos">Con amigos</option>
-                                        <option value="familia con niños">Familia con niños</option>
-                                        <option value="grupo grande">Grupo grande</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Estilo de viaje</label>
-                                    <div id="itin-vibes-container" style="display:flex; flex-wrap:wrap; gap:6px;">
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'cultura y museos')" style="font-size:0.78rem; padding:5px 10px;">🏛️ Cultura</button>
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'aventura y naturaleza')" style="font-size:0.78rem; padding:5px 10px;">🧗 Aventura</button>
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'gastronomía local')" style="font-size:0.78rem; padding:5px 10px;">🍽️ Gastronomía</button>
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'relax y bienestar')" style="font-size:0.78rem; padding:5px 10px;">🧘 Relax</button>
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'vida nocturna')" style="font-size:0.78rem; padding:5px 10px;">🌙 Nocturna</button>
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'compras y moda')" style="font-size:0.78rem; padding:5px 10px;">🛍️ Compras</button>
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'fotografía y paisajes')" style="font-size:0.78rem; padding:5px 10px;">📸 Fotos</button>
-                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'familia y niños')" style="font-size:0.78rem; padding:5px 10px;">👨‍👩‍👧 Familia</button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Notas extra (opcional)</label>
-                                    <textarea id="itin-extra" placeholder="Ej: tengo alergia al gluten, me interesan los mercados locales..." style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.88rem; resize:none; height:70px; outline:none; box-sizing:border-box;"></textarea>
-                                </div>
-
-                                <button onclick="generateItineraryForDest()" id="itin-generate-btn"
-                                    style="padding:14px; background:linear-gradient(135deg,var(--brand-teal),#00a381); color:#fff; border:none; border-radius:12px; cursor:pointer; font-family:inherit; font-weight:700; font-size:1rem; transition:opacity 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;"
-                                    onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
-                                    <i class="fas fa-magic"></i> Generar Itinerario con IA
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Result Panel -->
-                        <div id="itin-result-panel">
-                            <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:32px; box-shadow:var(--shadow-sm); min-height:300px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-direction:column; gap:12px; text-align:center;">
-                                <i class="fas fa-route" style="font-size:3rem; opacity:0.25;"></i>
-                                <p style="margin:0;">Configura tu viaje y pulsa <b>Generar Itinerario</b></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: SAVED -->
-            <div id="itin-saved-view" style="display:none;">
-                <div id="itin-saved-list">
-                    <div style="text-align:center; color:var(--text-muted); padding:60px;">
-                        <i class="fas fa-bookmark" style="font-size:3rem; opacity:0.25; margin-bottom:15px; display:block;"></i>
-                        Aún no tienes itinerarios guardados.
-                        <br><button onclick="switchItinTab('plan', document.getElementById('itin-tab-plan'))" style="margin-top:15px; background:none; border:1px solid var(--brand-teal); color:var(--brand-teal); padding:8px 18px; border-radius:8px; cursor:pointer; font-family:inherit;">Crear uno ahora</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: EXPLORE (community DB) -->
-            <div id="itin-explore-view" style="display:none;">
-                <div class="search-container" style="margin-bottom:20px;">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="itinerary-search" class="search-input" placeholder="Filtrar por viajero o destino..." onkeyup="filterItineraries()">
-                </div>
-                <div id="itineraries-list"><!-- community itineraries --></div>
-            </div>
-        </section>
-
-        <!-- Events View -->
-        <section id="events" class="view-section">
-            <!-- Tabs -->
-            <div class="tabs" style="margin-bottom:24px; display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="filter-btn active" id="ev-tab-discover" onclick="switchEvTab('discover', this)">
-                    <i class="fas fa-compass" style="margin-right:6px;"></i>Descubrir Eventos
-                </button>
-                <button class="filter-btn" id="ev-tab-db" onclick="switchEvTab('database', this)">
-                    <i class="fas fa-database" style="margin-right:6px;"></i>Base de Datos
-                </button>
-            </div>
-
-            <!-- TAB: DISCOVER (AI) -->
-            <div id="ev-discover-view">
-                <!-- Step 1: Pick destination -->
-                <div id="ev-step1">
-                    <div style="margin-bottom:20px;">
-                        <h3 style="margin:0 0 6px; color:var(--text-header);">¿Dónde quieres ir?</h3>
-                        <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">Selecciona un destino y Gemini buscará los mejores eventos para ti</p>
-                    </div>
-                    <div class="search-container" style="margin-bottom:20px;">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="ev-dest-search" class="search-input" placeholder="Buscar destino..." oninput="filterEvDestinations()">
-                    </div>
-                    <div id="ev-dest-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
-                        <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">
-                            <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; margin-bottom:10px;"></i>
-                            <p>Cargando destinos...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Configure & Generate -->
-                <div id="ev-step2" style="display:none;">
-                    <button onclick="backToEvStep1()" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-family:inherit; font-size:0.9rem; padding:0; margin-bottom:20px; display:flex; align-items:center; gap:6px;">
-                        <i class="fas fa-arrow-left"></i> Volver a destinos
-                    </button>
-
-                    <div style="display:grid; grid-template-columns:300px 1fr; gap:24px; align-items:start;">
-                        <!-- Config Panel -->
-                        <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:24px; box-shadow:var(--shadow-sm); position:sticky; top:20px;">
-                            <div id="ev-selected-dest-header" style="margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border-color);">
-                                <!-- Filled dynamically -->
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:14px;">
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">¿Cuándo vas?</label>
-                                    <input type="date" id="ev-date-from" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
-                                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Hasta (opcional):</div>
-                                    <input type="date" id="ev-date-to" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem; box-sizing:border-box; margin-top:4px;">
-                                </div>
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">Tipo de eventos</label>
-                                    <div style="display:flex; flex-wrap:wrap; gap:6px;" id="ev-type-btns">
-                                        <button class="filter-btn active" onclick="toggleEvType(this, 'todos')" data-type="todos" style="font-size:0.8rem; padding:6px 12px;">🌟 Todos</button>
-                                        <button class="filter-btn" onclick="toggleEvType(this, 'Música')" data-type="Música" style="font-size:0.8rem; padding:6px 12px;">🎵 Música</button>
-                                        <button class="filter-btn" onclick="toggleEvType(this, 'Cultura')" data-type="Cultura" style="font-size:0.8rem; padding:6px 12px;">🏛️ Cultura</button>
-                                        <button class="filter-btn" onclick="toggleEvType(this, 'Deporte')" data-type="Deporte" style="font-size:0.8rem; padding:6px 12px;">⚽ Deporte</button>
-                                        <button class="filter-btn" onclick="toggleEvType(this, 'Teatro')" data-type="Teatro" style="font-size:0.8rem; padding:6px 12px;">🎭 Teatro</button>
-                                        <button class="filter-btn" onclick="toggleEvType(this, 'Gastronomía')" data-type="Gastronomía" style="font-size:0.8rem; padding:6px 12px;">🍽️ Gastronomía</button>
-                                        <button class="filter-btn" onclick="toggleEvType(this, 'Naturaleza')" data-type="Naturaleza" style="font-size:0.8rem; padding:6px 12px;">🌿 Naturaleza</button>
-                                        <button class="filter-btn" onclick="toggleEvType(this, 'Fiesta')" data-type="Fiesta" style="font-size:0.8rem; padding:6px 12px;">🎉 Fiesta</button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Intereses o notas</label>
-                                    <textarea id="ev-extra" placeholder="Ej: soy fan del flamenco, me gustan las ferias medievales..." style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.88rem; resize:none; height:60px; outline:none; box-sizing:border-box;"></textarea>
-                                </div>
-                                <button onclick="generateEventsForDest()" id="ev-generate-btn"
-                                    style="padding:14px; background:linear-gradient(135deg,var(--brand-orange),#e17055); color:#fff; border:none; border-radius:12px; cursor:pointer; font-family:inherit; font-weight:700; font-size:1rem; transition:opacity 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;"
-                                    onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
-                                    <i class="fas fa-magic"></i> Buscar Eventos con IA
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Result Panel -->
-                        <div id="ev-result-panel">
-                            <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:32px; box-shadow:var(--shadow-sm); min-height:300px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-direction:column; gap:12px; text-align:center;">
-                                <i class="fas fa-calendar-star" style="font-size:3rem; opacity:0.25;"></i>
-                                <p style="margin:0;">Configura tu búsqueda y pulsa <b>Buscar Eventos</b></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: DATABASE -->
-            <div id="ev-database-view" style="display:none;">
-                <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap; padding-bottom: 5px; align-items: center; margin-bottom:16px;">
-                    <input type="text" id="event-location-input" list="event-locations" class="search-input"
-                        placeholder="Buscar destino..." oninput="filterEventsCombined()"
-                        style="flex: 1; min-width: 200px; padding: 10px 15px;">
-                    <datalist id="event-locations"></datalist>
-                    <div style="display: flex; gap: 8px; flex-wrap:wrap;">
-                        <button class="filter-btn active" onclick="filterEventsByType('all', this)">Todos</button>
-                        <button class="filter-btn" onclick="filterEventsByType('Deporte', this)">Deportes</button>
-                        <button class="filter-btn" onclick="filterEventsByType('Música', this)">Música</button>
-                        <button class="filter-btn" onclick="filterEventsByType('Cultura', this)">Cultura</button>
-                        <button class="filter-btn" onclick="filterEventsByType('Teatro', this)">Teatro</button>
-                    </div>
-                </div>
-                <div class="dashboard-grid" id="events-grid"><!-- Events injected here --></div>
-            </div>
-        </section><!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -1405,35 +1162,247 @@
 
         <!-- Itineraries View -->
         <section id="itineraries" class="view-section">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="itinerary-search" class="search-input"
-                    placeholder="Filtrar por viajero o destino..." onkeyup="filterItineraries()">
+            <!-- Tabs -->
+            <div class="tabs" style="margin-bottom:24px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="filter-btn active" id="itin-tab-plan" onclick="switchItinTab('plan', this)">
+                    <i class="fas fa-route" style="margin-right:6px;"></i>Planificar Viaje
+                </button>
+                <button class="filter-btn" id="itin-tab-saved" onclick="switchItinTab('saved', this)">
+                    <i class="fas fa-bookmark" style="margin-right:6px;"></i>Mis Itinerarios Guardados
+                </button>
+                <button class="filter-btn" id="itin-tab-explore" onclick="switchItinTab('explore', this)">
+                    <i class="fas fa-globe" style="margin-right:6px;"></i>Explorar de la Comunidad
+                </button>
             </div>
-            <div id="itineraries-list">
-                <!-- Itinerary cards injected here -->
+
+            <!-- TAB: PLAN -->
+            <div id="itin-plan-view">
+                <!-- Step 1: Pick destination -->
+                <div id="itin-step1">
+                    <div style="margin-bottom:20px;">
+                        <h3 style="margin:0 0 6px; color:var(--text-header);">¿A dónde quieres ir?</h3>
+                        <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">Selecciona un destino para generar tu itinerario personalizado con IA</p>
+                    </div>
+                    <div class="search-container" style="margin-bottom:20px;">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="itin-dest-search" class="search-input" placeholder="Buscar destino..." oninput="filterItinDestinations()">
+                    </div>
+                    <div id="itin-dest-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+                        <!-- Filled by renderItinDestinations() -->
+                        <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; margin-bottom:10px;"></i>
+                            <p>Cargando destinos...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Configure & Generate -->
+                <div id="itin-step2" style="display:none;">
+                    <button onclick="backToItinStep1()" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-family:inherit; font-size:0.9rem; padding:0; margin-bottom:20px; display:flex; align-items:center; gap:6px;">
+                        <i class="fas fa-arrow-left"></i> Volver a destinos
+                    </button>
+
+                    <div style="display:grid; grid-template-columns:320px 1fr; gap:24px; align-items:start;">
+                        <!-- Config Panel -->
+                        <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:24px; box-shadow:var(--shadow-sm); position:sticky; top:20px;">
+                            <div id="itin-selected-dest-header" style="margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border-color);">
+                                <!-- Filled dynamically -->
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:14px;">
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Duración del viaje</label>
+                                    <select id="itin-duration" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem;">
+                                        <option value="fin de semana (2-3 días)">Fin de semana (2-3 días)</option>
+                                        <option value="semana corta (4-5 días)">Semana corta (4-5 días)</option>
+                                        <option value="una semana (7 días)" selected>Una semana (7 días)</option>
+                                        <option value="10 días">10 días</option>
+                                        <option value="dos semanas (14 días)">Dos semanas (14 días)</option>
+                                        <option value="tres semanas">Tres semanas</option>
+                                        <option value="un mes">Un mes</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Presupuesto</label>
+                                    <select id="itin-budget" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem;">
+                                        <option value="mochilero (muy económico)">🎒 Mochilero</option>
+                                        <option value="económico" selected>💰 Económico</option>
+                                        <option value="moderado">💳 Moderado</option>
+                                        <option value="confort">⭐ Confort</option>
+                                        <option value="lujo">✨ Lujo</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Viajas con</label>
+                                    <select id="itin-company" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem;">
+                                        <option value="solo">Solo</option>
+                                        <option value="en pareja" selected>En pareja</option>
+                                        <option value="con amigos">Con amigos</option>
+                                        <option value="familia con niños">Familia con niños</option>
+                                        <option value="grupo grande">Grupo grande</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Estilo de viaje</label>
+                                    <div id="itin-vibes-container" style="display:flex; flex-wrap:wrap; gap:6px;">
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'cultura y museos')" style="font-size:0.78rem; padding:5px 10px;">🏛️ Cultura</button>
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'aventura y naturaleza')" style="font-size:0.78rem; padding:5px 10px;">🧗 Aventura</button>
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'gastronomía local')" style="font-size:0.78rem; padding:5px 10px;">🍽️ Gastronomía</button>
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'relax y bienestar')" style="font-size:0.78rem; padding:5px 10px;">🧘 Relax</button>
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'vida nocturna')" style="font-size:0.78rem; padding:5px 10px;">🌙 Nocturna</button>
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'compras y moda')" style="font-size:0.78rem; padding:5px 10px;">🛍️ Compras</button>
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'fotografía y paisajes')" style="font-size:0.78rem; padding:5px 10px;">📸 Fotos</button>
+                                        <button class="filter-btn" onclick="toggleItinVibe(this, 'familia y niños')" style="font-size:0.78rem; padding:5px 10px;">👨‍👩‍👧 Familia</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Notas extra (opcional)</label>
+                                    <textarea id="itin-extra" placeholder="Ej: tengo alergia al gluten, me interesan los mercados locales..." style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.88rem; resize:none; height:70px; outline:none; box-sizing:border-box;"></textarea>
+                                </div>
+
+                                <button onclick="generateItineraryForDest()" id="itin-generate-btn"
+                                    style="padding:14px; background:linear-gradient(135deg,var(--brand-teal),#00a381); color:#fff; border:none; border-radius:12px; cursor:pointer; font-family:inherit; font-weight:700; font-size:1rem; transition:opacity 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;"
+                                    onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+                                    <i class="fas fa-magic"></i> Generar Itinerario con IA
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Result Panel -->
+                        <div id="itin-result-panel">
+                            <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:32px; box-shadow:var(--shadow-sm); min-height:300px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-direction:column; gap:12px; text-align:center;">
+                                <i class="fas fa-route" style="font-size:3rem; opacity:0.25;"></i>
+                                <p style="margin:0;">Configura tu viaje y pulsa <b>Generar Itinerario</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: SAVED -->
+            <div id="itin-saved-view" style="display:none;">
+                <div id="itin-saved-list">
+                    <div style="text-align:center; color:var(--text-muted); padding:60px;">
+                        <i class="fas fa-bookmark" style="font-size:3rem; opacity:0.25; margin-bottom:15px; display:block;"></i>
+                        Aún no tienes itinerarios guardados.
+                        <br><button onclick="switchItinTab('plan', document.getElementById('itin-tab-plan'))" style="margin-top:15px; background:none; border:1px solid var(--brand-teal); color:var(--brand-teal); padding:8px 18px; border-radius:8px; cursor:pointer; font-family:inherit;">Crear uno ahora</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: EXPLORE (community DB) -->
+            <div id="itin-explore-view" style="display:none;">
+                <div class="search-container" style="margin-bottom:20px;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="itinerary-search" class="search-input" placeholder="Filtrar por viajero o destino..." onkeyup="filterItineraries()">
+                </div>
+                <div id="itineraries-list"><!-- community itineraries --></div>
             </div>
         </section>
 
         <!-- Events View -->
         <section id="events" class="view-section">
-            <div class="search-container"
-                style="display: flex; gap: 10px; flex-wrap: wrap; padding-bottom: 5px; align-items: center;">
-                <input type="text" id="event-location-input" list="event-locations" class="search-input"
-                    placeholder="Buscar destino..." oninput="filterEventsCombined()"
-                    style="flex: 1; min-width: 200px; padding: 10px 15px;">
-                <datalist id="event-locations"></datalist>
+            <!-- Tabs -->
+            <div class="tabs" style="margin-bottom:24px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="filter-btn active" id="ev-tab-discover" onclick="switchEvTab('discover', this)">
+                    <i class="fas fa-compass" style="margin-right:6px;"></i>Descubrir Eventos
+                </button>
+                <button class="filter-btn" id="ev-tab-db" onclick="switchEvTab('database', this)">
+                    <i class="fas fa-database" style="margin-right:6px;"></i>Base de Datos
+                </button>
+            </div>
 
-                <div style="display: flex; gap: 10px; overflow-x: auto;">
-                    <button class="filter-btn active" onclick="filterEventsByType('all', this)">Todos 🌟</button>
-                    <button class="filter-btn" onclick="filterEventsByType('Deporte', this)">Deportes ⚽</button>
-                    <button class="filter-btn" onclick="filterEventsByType('Música', this)">Música 🎵</button>
-                    <button class="filter-btn" onclick="filterEventsByType('Cultura', this)">Cultura 🎭</button>
-                    <button class="filter-btn" onclick="filterEventsByType('Teatro', this)">Teatro 🎬</button>
+            <!-- TAB: DISCOVER (AI) -->
+            <div id="ev-discover-view">
+                <!-- Step 1: Pick destination -->
+                <div id="ev-step1">
+                    <div style="margin-bottom:20px;">
+                        <h3 style="margin:0 0 6px; color:var(--text-header);">¿Dónde quieres ir?</h3>
+                        <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">Selecciona un destino y Gemini buscará los mejores eventos para ti</p>
+                    </div>
+                    <div class="search-container" style="margin-bottom:20px;">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="ev-dest-search" class="search-input" placeholder="Buscar destino..." oninput="filterEvDestinations()">
+                    </div>
+                    <div id="ev-dest-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+                        <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">
+                            <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; margin-bottom:10px;"></i>
+                            <p>Cargando destinos...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Configure & Generate -->
+                <div id="ev-step2" style="display:none;">
+                    <button onclick="backToEvStep1()" style="background:none; border:none; color:var(--brand-teal); cursor:pointer; font-family:inherit; font-size:0.9rem; padding:0; margin-bottom:20px; display:flex; align-items:center; gap:6px;">
+                        <i class="fas fa-arrow-left"></i> Volver a destinos
+                    </button>
+
+                    <div style="display:grid; grid-template-columns:300px 1fr; gap:24px; align-items:start;">
+                        <!-- Config Panel -->
+                        <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:24px; box-shadow:var(--shadow-sm); position:sticky; top:20px;">
+                            <div id="ev-selected-dest-header" style="margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border-color);">
+                                <!-- Filled dynamically -->
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:14px;">
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">¿Cuándo vas?</label>
+                                    <input type="date" id="ev-date-from" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
+                                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Hasta (opcional):</div>
+                                    <input type="date" id="ev-date-to" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.9rem; box-sizing:border-box; margin-top:4px;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">Tipo de eventos</label>
+                                    <div style="display:flex; flex-wrap:wrap; gap:6px;" id="ev-type-btns">
+                                        <button class="filter-btn active" onclick="toggleEvType(this, 'todos')" data-type="todos" style="font-size:0.8rem; padding:6px 12px;">🌟 Todos</button>
+                                        <button class="filter-btn" onclick="toggleEvType(this, 'Música')" data-type="Música" style="font-size:0.8rem; padding:6px 12px;">🎵 Música</button>
+                                        <button class="filter-btn" onclick="toggleEvType(this, 'Cultura')" data-type="Cultura" style="font-size:0.8rem; padding:6px 12px;">🏛️ Cultura</button>
+                                        <button class="filter-btn" onclick="toggleEvType(this, 'Deporte')" data-type="Deporte" style="font-size:0.8rem; padding:6px 12px;">⚽ Deporte</button>
+                                        <button class="filter-btn" onclick="toggleEvType(this, 'Teatro')" data-type="Teatro" style="font-size:0.8rem; padding:6px 12px;">🎭 Teatro</button>
+                                        <button class="filter-btn" onclick="toggleEvType(this, 'Gastronomía')" data-type="Gastronomía" style="font-size:0.8rem; padding:6px 12px;">🍽️ Gastronomía</button>
+                                        <button class="filter-btn" onclick="toggleEvType(this, 'Naturaleza')" data-type="Naturaleza" style="font-size:0.8rem; padding:6px 12px;">🌿 Naturaleza</button>
+                                        <button class="filter-btn" onclick="toggleEvType(this, 'Fiesta')" data-type="Fiesta" style="font-size:0.8rem; padding:6px 12px;">🎉 Fiesta</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Intereses o notas</label>
+                                    <textarea id="ev-extra" placeholder="Ej: soy fan del flamenco, me gustan las ferias medievales..." style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-family:inherit; font-size:0.88rem; resize:none; height:60px; outline:none; box-sizing:border-box;"></textarea>
+                                </div>
+                                <button onclick="generateEventsForDest()" id="ev-generate-btn"
+                                    style="padding:14px; background:linear-gradient(135deg,var(--brand-orange),#e17055); color:#fff; border:none; border-radius:12px; cursor:pointer; font-family:inherit; font-weight:700; font-size:1rem; transition:opacity 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;"
+                                    onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+                                    <i class="fas fa-magic"></i> Buscar Eventos con IA
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Result Panel -->
+                        <div id="ev-result-panel">
+                            <div style="background:var(--card-bg); border:var(--glass-border); border-radius:18px; padding:32px; box-shadow:var(--shadow-sm); min-height:300px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-direction:column; gap:12px; text-align:center;">
+                                <i class="fas fa-calendar-star" style="font-size:3rem; opacity:0.25;"></i>
+                                <p style="margin:0;">Configura tu búsqueda y pulsa <b>Buscar Eventos</b></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="dashboard-grid" id="events-grid">
-                <!-- Events injected here -->
+
+            <!-- TAB: DATABASE -->
+            <div id="ev-database-view" style="display:none;">
+                <div class="search-container" style="display: flex; gap: 10px; flex-wrap: wrap; padding-bottom: 5px; align-items: center; margin-bottom:16px;">
+                    <input type="text" id="event-location-input" list="event-locations" class="search-input"
+                        placeholder="Buscar destino..." oninput="filterEventsCombined()"
+                        style="flex: 1; min-width: 200px; padding: 10px 15px;">
+                    <datalist id="event-locations"></datalist>
+                    <div style="display: flex; gap: 8px; flex-wrap:wrap;">
+                        <button class="filter-btn active" onclick="filterEventsByType('all', this)">Todos</button>
+                        <button class="filter-btn" onclick="filterEventsByType('Deporte', this)">Deportes</button>
+                        <button class="filter-btn" onclick="filterEventsByType('Música', this)">Música</button>
+                        <button class="filter-btn" onclick="filterEventsByType('Cultura', this)">Cultura</button>
+                        <button class="filter-btn" onclick="filterEventsByType('Teatro', this)">Teatro</button>
+                    </div>
+                </div>
+                <div class="dashboard-grid" id="events-grid"><!-- Events injected here --></div>
             </div>
         </section>
 
@@ -4235,6 +4204,17 @@ S� muy espec�fico con los precios reales actuales del destino.`;
             }
         }
 
+        function waitForDestsAndRender(type, attempt) {
+            attempt = attempt || 0;
+            if (window.allDestinations && window.allDestinations.length > 0) {
+                if (type === 'ev' && typeof renderEvDestinations === 'function') renderEvDestinations();
+                if (type === 'itin' && typeof renderItinDestinations === 'function') renderItinDestinations();
+            } else if (attempt < 20) {
+                // destinations not loaded yet - fetch them first then retry
+                if (attempt === 0) fetchDestinations();
+                setTimeout(() => waitForDestsAndRender(type, attempt + 1), 300);
+            }
+        }
         function waitForDataAndRenderHome(attempt) {
             attempt = attempt || 0;
             if (window.allDestinations && window.allDestinations.length > 0) {
