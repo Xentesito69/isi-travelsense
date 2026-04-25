@@ -2803,7 +2803,47 @@ Usa HTML atractivo con emojis, colores y estilos inline. Todo en español y con 
 
         // PDF Simulation
         // PDF Export
-        function downloadPDF(id) {
+        function downloadGeminiPDF(elementId, filename) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                showToast('No hay contenido para descargar', 'error');
+                return;
+            }
+            filename = filename || 'TravelSense_Export.pdf';
+            showToast('Preparando PDF...', 'info');
+
+            // Create a clean white wrapper for printing
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;width:794px;padding:40px;box-sizing:border-box;font-family:Arial,sans-serif;color:#000;';
+            wrapper.innerHTML = element.innerHTML;
+            // Force all text to black for PDF
+            const style = document.createElement('style');
+            style.textContent = '* { color: #000 !important; background: transparent !important; } h1,h2,h3 { color: #0E2A47 !important; }';
+            wrapper.appendChild(style);
+            document.body.appendChild(wrapper);
+
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            setTimeout(() => {
+                html2pdf().from(wrapper).set(opt).save()
+                    .then(() => {
+                        document.body.removeChild(wrapper);
+                        showToast('✅ PDF descargado con éxito', 'success');
+                    })
+                    .catch(err => {
+                        console.error('PDF error:', err);
+                        if (document.body.contains(wrapper)) document.body.removeChild(wrapper);
+                        showToast('Error al generar PDF', 'error');
+                    });
+            }, 600);
+        }
+function downloadPDF(id) {
             if (!window.allItineraries) return;
             const itinerary = window.allItineraries.find(i => i.id === id);
             if (!itinerary) return;
@@ -5238,46 +5278,7 @@ function haversine(lat1, lon1, lat2, lon2) {
             waitForDataAndRenderHome();
         });
     
-        function switchItinTab(tab, btn) {
-            document.querySelectorAll("#itineraries .filter-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            const exp = document.getElementById("itin-explore-view");
-            const sav = document.getElementById("itin-saved-view");
-            if(exp) exp.style.display = (tab === "explore") ? "block" : "none";
-            if(sav) sav.style.display = (tab === "saved") ? "block" : "none";
-            if (tab === "saved") renderSavedItineraries();
-        }
-
-        function renderSavedItineraries() {
-            const grid = document.getElementById("itineraries-saved-list") || document.getElementById("profile-itineraries-list");
-            if (!grid) return;
-            const items = getSavedItineraries();
-            if (!items.length) {
-                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;opacity:0.5;"><p>No hay itinerarios guardados.</p></div>`;
-                return;
-            }
-            grid.innerHTML = items.map(it => `
-                <div class="card">
-                    <div class="card-title">${it.destName}</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Guardado el ${it.dateSaved}</div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="populate-btn" onclick="showItineraryDetails('${it.id}')">Ver Detalle</button>
-                        <button class="populate-btn" style="background:transparent;border:1px solid #eb4d4b;color:#eb4d4b;" onclick="deleteSavedItinerary('${it.id}')">Eliminar</button>
-                    </div>
-                </div>
-            `).join("");
-        }
         
-        function deleteSavedItinerary(id) {
-            if (!confirm("�Seguro que quieres eliminar este itinerario?")) return;
-            let items = getSavedItineraries();
-            items = items.filter(it => it.id !== id);
-            localStorage.setItem("travelsense_itineraries", JSON.stringify(items));
-            renderSavedItineraries();
-            showToast("Itinerario eliminado", "info");
-        }
-
-        // ===== ONBOARDING =====
         function showOnboarding(nombre) {
             const modal = document.getElementById("onboarding-modal");
             if (modal) {
