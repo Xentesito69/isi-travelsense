@@ -11,6 +11,8 @@
 | **Flask-CORS** | Latest | Permite peticiones cross-origin desde el frontend |
 | **SQLite** | Integrado en Python | Base de datos relacional sin servidor |
 | **Faker** | Latest | Generación de datos de prueba realistas |
+| **Google Auth** | Latest | Verificación de tokens SSO de Google |
+| **Google GenAI** | Latest | Conexión con el modelo Gemini (LLM) |
 
 ### Frontend
 

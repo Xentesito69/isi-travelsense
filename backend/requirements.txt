@@ -1,2 +1,7 @@
-﻿flask
+flask
+flask-cors
 faker
+google-auth
+requests
+google-generativeai
+python-dotenv

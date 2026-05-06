@@ -1,5 +1,4 @@
-﻿        <!-- Itineraries View -->
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -14,7 +13,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- pdf export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -1409,7 +1409,12 @@
         <!-- Settings View -->
         <section id="settings" class="view-section">
             <div style="max-width: 600px;">
-                <!-- Removed profile block -->
+                <!-- Cerrar Sesion - arriba -->
+                <div style="display:flex; justify-content:flex-end; margin-bottom:30px;">
+                    <button onclick="logout()" style="display:flex; align-items:center; gap:8px; padding:10px 22px; background:transparent; border:1px solid rgba(235,77,75,0.5); color:#eb4d4b; border-radius:10px; cursor:pointer; font-family:inherit; font-size:0.9rem; font-weight:600; transition:all 0.2s;" onmouseover="this.style.background='rgba(235,77,75,0.1)'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesi&#243;n
+                    </button>
+                </div>
 
                 <h3 style="color: var(--text-header); margin-bottom: 20px;">Apariencia</h3>
                 <div class="switch-container">
@@ -1444,15 +1449,7 @@
                     </div>
                 </div>
 
-                <div style="background: rgba(235, 77, 75, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(235, 77, 75, 0.2); margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h4 style="margin: 0; color: #eb4d4b;">Eliminar Cuenta</h4>
-                        <p style="margin: 5px 0 0; font-size: 0.8rem; color: var(--text-muted);">Borra permanentemente todos tus datos de este dispositivo.</p>
-                    </div>
-                    <button class="populate-btn" onclick="deleteAccount()" style="background: #eb4d4b; color: white; border: none; padding: 10px 20px;">
-                        <i class="fas fa-trash-alt"></i> ELIMINAR
-                    </button>
-                </div>
+
 
                 <h3 style="color: var(--text-header); margin-bottom: 20px; margin-top: 40px;">Sistema</h3>
                 <div class="switch-container">
@@ -1467,22 +1464,18 @@
                     </label>
                 </div>
 
-                <div class="switch-container" style="border-color: rgba(255,0,0,0.2);">
-                    <div>
-                        <div style="font-weight: 600; color: #e17055;">Resetear Datos</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">Borrar base de datos y reiniciar
-                        </div>
-                    </div>
-                    <button class="populate-btn" onclick="populateDatabase()"
-                        style="background: linear-gradient(135deg, #ff7675, #d63031); box-shadow: 0 4px 15px rgba(214, 48, 49, 0.3);">
-                        <i class="fas fa-trash"></i> Resetear
-                    </button>
-                </div>
 
-                <div style="margin-top: 40px; text-align: center;">
-                    <button class="populate-btn" onclick="logout()"
-                        style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); box-shadow: none; margin: 0 auto;">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+
+
+
+                <!-- Eliminar Cuenta - al final -->
+                <div style="background:rgba(235,77,75,0.05);padding:22px;border-radius:14px;border:1.5px solid rgba(235,77,75,0.25);margin-top:40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <h4 style="margin:0;color:#eb4d4b;font-size:1rem;"><i class="fas fa-user-times"></i> Eliminar Cuenta</h4>
+                        <p style="margin:5px 0 0;font-size:0.8rem;color:var(--text-muted);">Borra permanentemente todos tus datos de este dispositivo.</p>
+                    </div>
+                    <button class="populate-btn" onclick="deleteAccount()" style="background:#eb4d4b;color:white;border:none;padding:10px 20px;flex-shrink:0;">
+                        <i class="fas fa-trash-alt"></i> ELIMINAR
                     </button>
                 </div>
             </div>
@@ -1776,14 +1769,27 @@
                 <div class="settings-block"
                     style="background: var(--card-bg); padding: 25px; border-radius: 16px; border: var(--glass-border); margin-bottom: 30px;">
                     <div style="display: flex; gap: 20px; align-items: start; flex-wrap: wrap;">
-                        <div style="text-align: center;">
-                            <img id="profile-avatar-preview"
-                                src="https://ui-avatars.com/api/?name=Viajero&background=00b894&color=fff"
-                                style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--brand-teal); margin-bottom: 10px;">
-                            <br>
-                            <button onclick="changeAvatar()" class="filter-btn"
-                                style="width: 100%; justify-content: center; font-size: 0.8rem;">Cambiar Foto</button>
+                        <div style="text-align:center;">
+                            <div id="avatar-drop-zone"
+                                onclick="document.getElementById('avatar-file-input').click()"
+                                ondragover="event.preventDefault();this.style.borderColor='var(--brand-teal)';this.style.background='rgba(0,184,148,0.08)'"
+                                ondragleave="this.style.borderColor='';this.style.background=''"
+                                ondrop="handleAvatarDrop(event)"
+                                style="width:110px;height:110px;border-radius:50%;border:2.5px dashed rgba(0,184,148,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;margin:0 auto 8px;"
+                                onmouseover="document.getElementById('avatar-overlay').style.opacity='1'"
+                                onmouseout="document.getElementById('avatar-overlay').style.opacity='0'">
+                                <img id="profile-avatar-preview"
+                                    src="https://ui-avatars.com/api/?name=Viajero&background=00b894&color=fff"
+                                    style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                                <div id="avatar-overlay" style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.55);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;pointer-events:none;">
+                                    <i class="fas fa-camera" style="color:#fff;font-size:1.2rem;"></i>
+                                    <span style="color:#fff;font-size:0.62rem;margin-top:3px;">Cambiar</span>
+                                </div>
+                            </div>
+                            <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarFile(this)">
+                            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Arrastra o haz clic</div>
                         </div>
+
                         <div style="flex-grow: 1; min-width: 250px;">
                             <div style="margin-bottom: 15px;">
                                 <label
@@ -1946,27 +1952,34 @@
         }
 
         // --- Community / Follow System ---
+        // Uses email as the stable follow identifier to survive ID prefix changes
         function getFollowing() {
             return JSON.parse(localStorage.getItem('ts_following') || '[]');
         }
 
+        function _resolveFollowId(id) {
+            // Normalize: extract email from traveler objects stored in allTravelers
+            const t = (allTravelers || []).find(t => t.id === id);
+            return (t && t.email) ? t.email : id;
+        }
+
         function isFollowing(id) {
-            return getFollowing().includes(id);
+            const key = _resolveFollowId(id);
+            return getFollowing().includes(key);
         }
 
         function toggleFollow(travelerId, travelerName) {
+            const key = _resolveFollowId(travelerId);
             let following = getFollowing();
-            if (following.includes(travelerId)) {
-                following = following.filter(id => id !== travelerId);
+            if (following.includes(key)) {
+                following = following.filter(id => id !== key);
                 showToast(`Dejaste de seguir a ${travelerName}`, 'info');
             } else {
-                following.push(travelerId);
+                following.push(key);
                 showToast(`¡Ahora sigues a ${travelerName}!`, 'success');
             }
             localStorage.setItem('ts_following', JSON.stringify(following));
             saveCurrentUserData();
-            
-            // Refresh views if open
             if (document.getElementById('travelers').classList.contains('active')) {
                 loadTravelers();
             }
@@ -1974,15 +1987,18 @@
 
         function getFollowerCount(travelerId) {
             try {
+                const key = _resolveFollowId(travelerId);
                 const currEmail = localStorage.getItem('ts_current_user_email') || '';
                 const community = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
                 let count = 0;
+                // Check all local users
                 community.forEach(u => {
                     if (u.email === currEmail) return;
                     const f = JSON.parse(localStorage.getItem(u.ns + 'ts_following') || '[]');
-                    if (f.includes(travelerId)) count++;
+                    if (f.includes(key) || f.includes(travelerId)) count++;
                 });
-                if (isFollowing(travelerId)) count++;
+                // Count if current user follows them
+                if (getFollowing().includes(key) || getFollowing().includes(travelerId)) count++;
                 return count;
             } catch(e) { return 0; }
         }
@@ -1990,8 +2006,11 @@
         function getFollowingCount(travelerId) {
             if (travelerId === 'me') return getFollowing().length;
             try {
+                const t = (allTravelers || []).find(t => t.id === travelerId);
                 const community = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
-                const user = community.find(u => 'real-' + u.email === travelerId);
+                // Find by email (stable key)
+                const email = t?.email;
+                const user = email ? community.find(u => u.email === email) : null;
                 if (user && user.ns) {
                     return JSON.parse(localStorage.getItem(user.ns + 'ts_following') || '[]').length;
                 }
@@ -2100,20 +2119,19 @@
 
         // Data Loading
         async function loadData(type) {
-            // General stats update
             if (typeof updateStats === 'function') updateStats();
             if (typeof updateUserStats === 'function') updateUserStats();
 
             if (type === 'home' || !type) {
                 fetchDestinations();
-                if (typeof fetchUsers === 'function') fetchUsers(); // Keep for admin view
+                if (typeof fetchUsers === 'function') fetchUsers();
                 fetchItineraries();
                 fetchEvents();
             } else {
                 if (type === 'travelers') loadTravelers();
                 if (type === 'destinations') fetchDestinations();
-                if (type === 'events') fetchEvents();
-                if (type === 'itineraries') fetchItineraries();
+                if (type === 'events') { fetchEvents(); waitForDestsAndRender('ev'); }
+                if (type === 'itineraries') { fetchItineraries(); waitForDestsAndRender('itin'); }
                 if (type === 'climatology') initClimatology();
                 if (type === 'settings') loadPrivacyToggles();
                 if (type === 'profile') {
@@ -2593,6 +2611,10 @@ Usa HTML atractivo con emojis, colores y estilos inline. Todo en español y con 
             const dests = await res.json();
             window.allDestinations = dests;
 
+            // Update stat counter now that data is ready
+            const el = document.getElementById('stat-dests');
+            if (el) el.innerText = dests.length;
+
             // Initialize Map with new data
             if (document.getElementById('destinations').classList.contains('active')) {
                 initMap(dests);
@@ -2801,48 +2823,61 @@ Usa HTML atractivo con emojis, colores y estilos inline. Todo en español y con 
             }
         }
 
-        // PDF Simulation
-        // PDF Export
-        function downloadGeminiPDF(elementId, filename) {
+        // PDF Export (canvas-based, multi-page)
+        async function downloadGeminiPDF(elementId, filename) {
             const element = document.getElementById(elementId);
-            if (!element) {
-                showToast('No hay contenido para descargar', 'error');
-                return;
+            if (!element) { showToast('No hay contenido para descargar', 'error'); return; }
+            filename = filename || 'TravelSense.pdf';
+            showToast('📸 Capturando contenido...', 'info');
+            try {
+                // Force white background on element before capture
+                const prevBg = element.style.background;
+                const prevColor = element.style.color;
+                element.style.background = '#ffffff';
+                element.style.color = '#222222';
+
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0
+                });
+
+                // Restore original styles
+                element.style.background = prevBg;
+                element.style.color = prevColor;
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.92);
+                const PAGE_W = 210;
+                const PAGE_H = 297;
+                const imgW = PAGE_W;
+                const imgH = (canvas.height * PAGE_W) / canvas.width;
+
+                const jsPDFLib = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+                if (!jsPDFLib) { showToast('Error: jsPDF no disponible', 'error'); return; }
+                const pdf = new jsPDFLib({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+                let heightLeft = imgH;
+                let pageTop = 0;
+                pdf.addImage(imgData, 'JPEG', 0, pageTop, imgW, imgH);
+                heightLeft -= PAGE_H;
+                while (heightLeft > 0) {
+                    pageTop -= PAGE_H;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, pageTop, imgW, imgH);
+                    heightLeft -= PAGE_H;
+                }
+                pdf.save(filename);
+                showToast('✅ PDF descargado', 'success');
+            } catch (err) {
+                console.error('PDF error:', err);
+                showToast('Error al generar PDF: ' + err.message, 'error');
             }
-            filename = filename || 'TravelSense_Export.pdf';
-            showToast('Preparando PDF...', 'info');
-
-            // Create a clean white wrapper for printing
-            const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;width:794px;padding:40px;box-sizing:border-box;font-family:Arial,sans-serif;color:#000;';
-            wrapper.innerHTML = element.innerHTML;
-            // Force all text to black for PDF
-            const style = document.createElement('style');
-            style.textContent = '* { color: #000 !important; background: transparent !important; } h1,h2,h3 { color: #0E2A47 !important; }';
-            wrapper.appendChild(style);
-            document.body.appendChild(wrapper);
-
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            setTimeout(() => {
-                html2pdf().from(wrapper).set(opt).save()
-                    .then(() => {
-                        document.body.removeChild(wrapper);
-                        showToast('✅ PDF descargado con éxito', 'success');
-                    })
-                    .catch(err => {
-                        console.error('PDF error:', err);
-                        if (document.body.contains(wrapper)) document.body.removeChild(wrapper);
-                        showToast('Error al generar PDF', 'error');
-                    });
-            }, 600);
         }
+
 function downloadPDF(id) {
             if (!window.allItineraries) return;
             const itinerary = window.allItineraries.find(i => i.id === id);
@@ -3562,7 +3597,7 @@ function downloadPDF(id) {
                 const answer = await callGemini(`Eres un experto asistente de viajes de TravelSense. ${userCtx}${text}`);
                 result.innerHTML = answer.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\*(.*?)\*/g, "<i>$1</i>");
             } catch(e) {
-                result.innerHTML = "?? Error conectando con Gemini. Comprueba tu conexi�n.";
+                result.innerHTML = "?? Error conectando con Gemini. Comprueba tu conexión.";
             }
         }
 
@@ -3574,23 +3609,23 @@ function downloadPDF(id) {
 
             const resultDiv = document.getElementById("gen-result");
             resultDiv.style.display = "block";
-            resultDiv.innerHTML = `<div class="card" style="text-align:center; padding:40px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini est� dise�ando tu viaje perfecto...</b></div>`;
+            resultDiv.innerHTML = `<div class="card" style="text-align:center; padding:40px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini está diseñando tu viaje perfecto...</b></div>`;
 
-            const budgetLabels = { low: "econ�mico (mochilero)", medium: "est�ndar (confort)", high: "lujo (premium)" };
+            const budgetLabels = { low: "económico (mochilero)", medium: "estándar (confort)", high: "lujo (premium)" };
             const companyLabels = { solo: "solo", couple: "en pareja", family: "en familia", friends: "con amigos" };
 
-            const prompt = `Eres el asistente de viajes IA de TravelSense. Dise�a un itinerario completo y detallado:
-- Duraci�n: ${duration}
+            const prompt = `Eres el asistente de viajes IA de TravelSense. Diseña un itinerario completo y detallado:
+- Duración: ${duration}
 - Presupuesto: ${budgetLabels[budget] || budget}
 - Viajando: ${companyLabels[company] || company}
 - Estilo: ${vibes}
 
-Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con: Estructura:
-1. Un encabezado h2 con el destino recomendado y pa�s (elige uno espec�fico, no gen�rico)
-2. P�rrafo con por qu� ese destino es perfecto para estas preferencias
-3. Itinerario d�a a d�a en divs con borde izquierdo verde #00B894, emoji por d�a
-4. Secci�n de consejos (presupuesto estimado en euros, mejor �poca, c�mo llegar)
-S� muy espec�fico con lugares, restaurantes y actividades reales.`;
+Responde ¿NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con: Estructura:
+1. Un encabezado h2 con el destino recomendado y país (elige uno específico, no genérico)
+2. Párrafo con por qué ese destino es perfecto para estas preferencias
+3. Itinerario día a día en divs con borde izquierdo verde #00B894, emoji por día
+4. Sección de consejos (presupuesto estimado en euros, mejor época, cómo llegar)
+Sé muy específico con lugares, restaurantes y actividades reales.`;
 
             try {
                 const html = await callGemini(prompt);
@@ -3608,7 +3643,7 @@ S� muy espec�fico con lugares, restaurantes y actividades reales.`;
                         </div>
                     </div>`;
             } catch(e) {
-                resultDiv.innerHTML = `<div class="card" style="color:#eb4d4b; text-align:center; padding:30px;">?? Error conectando con Gemini. Comprueba tu conexi�n a internet.</div>`;
+                resultDiv.innerHTML = `<div class="card" style="color:#eb4d4b; text-align:center; padding:30px;">?? Error conectando con Gemini. Comprueba tu conexión a internet.</div>`;
             }
         }
 
@@ -3752,18 +3787,18 @@ S� muy espec�fico con lugares, restaurantes y actividades reales.`;
             
             const resultDiv = document.getElementById('comp-result');
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `<div style="text-align:center; padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini est� analizando ambos destinos...</b></div>`;
+            resultDiv.innerHTML = `<div style="text-align:center; padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini está analizando ambos destinos...</b></div>`;
             
             const prompt = `Eres el comparador de destinos de TravelSense. Compara estos dos destinos de viaje en detalle:
 DESTINO A: ${d1.nombre} (${d1.pais}) - ${d1.descripcion} - Clima: ${d1.clima_tipico}
 DESTINO B: ${d2.nombre} (${d2.pais}) - ${d2.descripcion} - Clima: ${d2.clima_tipico}
 ${prefs.length > 0 ? "Preferencias del usuario: " + prefs.join(", ") : ""}
 
-Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con:
-1. Una tabla comparativa (precio estimado, clima, actividades, gastronom�a, facilidad de viaje)
-2. Un an�lisis de cu�l gana seg�n las preferencias indicadas
-3. Una secci�n "El veredicto de Gemini" con un ganador claro y por qu�
-4. Consejos espec�ficos para cada destino`;
+Responde ¿NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con:
+1. Una tabla comparativa (precio estimado, clima, actividades, gastronomía, facilidad de viaje)
+2. Un análisis de cuál gana según las preferencias indicadas
+3. Una sección "El veredicto de Gemini" con un ganador claro y por qué
+4. Consejos específicos para cada destino`;
             
             try {
                 const html = await callGemini(prompt);
@@ -3775,7 +3810,7 @@ Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> 
                         </button>
                     </div>`;
             } catch(e) {
-                resultDiv.innerHTML = `<div style="color:#eb4d4b; text-align:center;">?? Error de conexi�n con Gemini</div>`;
+                resultDiv.innerHTML = `<div style="color:#eb4d4b; text-align:center;">⚠️ Error de conexión con Gemini</div>`;
             }
         }
 
@@ -3792,20 +3827,22 @@ Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> 
             packResult.style.display = 'block';
             packResult.innerHTML = `<div style="text-align:center; padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--brand-teal);"></i><br><br><b>Gemini preparando tu lista de equipaje...</b></div>`;
             
-            const durationLabels = { weekend: 'fin de semana', week: '1 semana', long: '2 semanas o m�s' };
+            const durationLabels = { weekend: 'fin de semana', week: '1 semana', long: '2 semanas o más' };
             const typeLabels = { tourism: 'turismo y relax', business: 'negocios', adventure: 'aventura y trekking' };
             
             const prompt = `Eres el asistente de equipaje de TravelSense. Crea una lista de equipaje detallada y personalizada para:
 - Destino: ${dest ? dest.nombre + ' (' + dest.pais + ')' : 'destino'}
 - Fecha: ${dateStr}
-- Duraci�n: ${durationLabels[duration] || duration}
+- Duración: ${durationLabels[duration] || duration}
 - Tipo de viaje: ${typeLabels[type] || type}
-- Clima t�pico: ${dest?.clima_tipico || 'variable'}
+- Clima típico: ${dest?.clima_tipico || 'variable'}
 
-Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con secciones bien organizadas (ropa, calzado, higiene, electr�nica, documentos, extras espec�ficos del destino). Para cada item incluye un checkbox HTML funcional. Al final a�ade consejos espec�ficos del destino.`;
+Responde ¿NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con secciones bien organizadas (ropa, calzado, higiene, electrónica, documentos, extras específicos del destino). Para cada item incluye un checkbox HTML funcional. Al final añade consejos específicos del destino.`;
             
             try {
                 const html = await callGemini(prompt);
+                // Store generated HTML so saveChecklist() can persist it
+                window.currentChecklistHtml = html;
                 packResult.innerHTML = `
                     <div id="packing-result-content" style="background:var(--card-bg); border-radius:16px; padding:25px; border:1px solid var(--border-color);">
                         ${html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")}
@@ -3819,7 +3856,7 @@ Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> 
                         </button>
                     </div>`;
             } catch(e) {
-                packResult.innerHTML = `<div style="color:#eb4d4b; text-align:center;">?? Error de conexi�n con Gemini</div>`;
+                packResult.innerHTML = `<div style="color:#eb4d4b; text-align:center;">⚠️ Error de conexión con Gemini</div>`;
             }
         }
 
@@ -3836,20 +3873,20 @@ Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> 
             calcResult.style.display = 'block';
             calcResult.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Calculando con Gemini...`;
             
-            const styleLabels = { low: 'mochilero/econ�mico', medium: 'est�ndar/confort', high: 'lujo/premium' };
+            const styleLabels = { low: 'mochilero/económico', medium: 'estándar/confort', high: 'lujo/premium' };
             const prompt = `Eres la calculadora de presupuesto de TravelSense. Estima el coste REALISTA de un viaje:
 - Destino: ${dest ? dest.nombre + ' (' + dest.pais + ')' : 'destino'}
-- Duraci�n: ${days} d�as
+- Duración: ${days} días
 - Estilo: ${styleLabels[style] || style}
-- Vuelos: ${flights === 'included' ? 'incluir vuelos desde Espa�a' : 'sin vuelos (ya los tiene)'}
+- Vuelos: ${flights === 'included' ? 'incluir vuelos desde España' : 'sin vuelos (ya los tiene)'}
 
-Responde �NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con:
-1. Tabla desglosada por categor�as (alojamiento, comida, transporte, actividades, vuelos si aplica, extras)
-2. Total estimado por d�a y total del viaje (en euros)
-3. Consejos para ahorrar en ese destino espec�fico
-4. Rango (m�nimo - m�ximo) para el presupuesto
+Responde ¿NICAMENTE en HTML (sin bloques markdown). NO uses etiquetas <style> ni modifiques estilos globales. Cierra TODAS las etiquetas. Responde en HTML con:
+1. Tabla desglosada por categorías (alojamiento, comida, transporte, actividades, vuelos si aplica, extras)
+2. Total estimado por día y total del viaje (en euros)
+3. Consejos para ahorrar en ese destino específico
+4. Rango (mínimo - máximo) para el presupuesto
 
-S� muy espec�fico con los precios reales actuales del destino.`;
+Sé muy específico con los precios reales actuales del destino.`;
             
             try {
                 const html = await callGemini(prompt);
@@ -3859,7 +3896,7 @@ S� muy espec�fico con los precios reales actuales del destino.`;
                         <i class="fas fa-file-pdf"></i> Descargar PDF
                     </button>`;
             } catch(e) {
-                calcResult.innerHTML = `<div style="color:#eb4d4b;">?? Error de conexi�n con Gemini</div>`;
+                calcResult.innerHTML = `<div style="color:#eb4d4b;">⚠️ Error de conexión con Gemini</div>`;
             }
         }
         function compareDestinations() {
@@ -4556,43 +4593,73 @@ function haversine(lat1, lon1, lat2, lon2) {
 
             if (itineraries.length === 0) {
                 listContainer.innerHTML = `
-                    <div style="text-align: center; color: var(--text-muted); padding:40px; background:var(--card-bg); border-radius:12px; border:var(--glass-border);">
-                        <i class="fas fa-route" style="font-size:3rem; margin-bottom:15px; opacity:0.5;"></i>
-                        <p>No has guardado ningún itinerario de la IA todavía.</p>
-                        <button class="populate-btn" onclick="showView('ai-tools')" style="margin:20px auto 0;">Generar Viaje</button>
+                    <div style="text-align:center;color:var(--text-muted);padding:40px;background:var(--card-bg);border-radius:12px;border:var(--glass-border);">
+                        <i class="fas fa-route" style="font-size:3rem;margin-bottom:15px;opacity:0.5;"></i>
+                        <p>No has guardado ningún itinerario todavía.</p>
+                        <button class="populate-btn" onclick="showView('itineraries')" style="margin:20px auto 0;">Crear Itinerario</button>
                     </div>
                 `;
                 return;
             }
 
-            let html = '<div class="dashboard-grid">';
-
-            itineraries.forEach(it => {
-                // Find destination details if available
-                const dest = window.allDestinations ? window.allDestinations.find(d => d.id.toString() === it.destId) : null;
-                const imgStr = dest ? `https://placehold.co/400x200/00b894/ffffff?text=${encodeURIComponent(dest.nombre)}` : '';
-
-                html += `
-                <div class="card" style="padding:0; overflow:hidden; height:auto; animation:fadeIn 0.4s;">
-                    <div style="height:120px; background: url('${imgStr}') center/cover; position:relative;">
-                        <div class="badge" style="position:absolute; top:10px; right:10px; background:var(--brand-teal); color:white; font-size:0.8rem;">
-                            <i class="fas fa-calendar-alt"></i> ${it.dateSaved}
+            listContainer.innerHTML = itineraries.map(it => {
+                // Support both old (details/dateSaved) and new (htmlContent/date) formats
+                const dateStr = it.date || it.dateSaved || '';
+                const hasPDF = !!(it.htmlContent || (it.details && it.details.html));
+                return `
+                <div style="background:var(--card-bg);border:var(--glass-border);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow-sm);border-left:4px solid var(--brand-teal);">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+                        <div>
+                            <div style="font-size:1.1rem;font-weight:700;color:var(--text-header);">✈️ ${it.destName || 'Destino'}</div>
+                            <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">
+                                ${it.duration ? it.duration + ' · ' : ''}${it.budget ? it.budget + ' · ' : ''}${dateStr}
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button onclick="showProfileItineraryDetail('${it.id}')" style="padding:7px 14px;background:var(--brand-teal);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.82rem;">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            ${hasPDF ? `<button onclick="downloadProfileItineraryPDF('${it.id}')" style="padding:7px 14px;background:transparent;color:var(--brand-orange);border:1px solid var(--brand-orange);border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.82rem;"><i class="fas fa-file-pdf"></i> PDF</button>` : ''}
+                            <button onclick="deleteProfileItinerary('${it.id}')" style="padding:7px 14px;background:transparent;color:#eb4d4b;border:1px solid rgba(235,77,75,0.3);border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.82rem;"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
-                    <div style="padding:20px;">
-                        <h3 style="margin:0 0 10px 0; color:var(--text-header);">${it.destName}</h3>
-                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">Itinerario de 3 días generado por IA.</p>
-                        
-                        <button class="populate-btn" onclick="showItineraryDetails('${it.id}')" style="width:100%; justify-content:center; background:var(--card-bg); color:var(--text-main); border:1px solid var(--border-color);">
-                        <i class="fas fa-eye"></i> Ver Detalles
-                    </button>
-                    </div>
-                </div>
-                `;
-            });
+                    <div id="profile-itin-detail-${it.id}" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border-color);font-size:0.9rem;line-height:1.7;"></div>
+                </div>`;
+            }).join('');
+        }
 
-            html += '</div>';
-            listContainer.innerHTML = html;
+        function showProfileItineraryDetail(id) {
+            const el = document.getElementById('profile-itin-detail-' + id);
+            if (!el) return;
+            if (el.style.display === 'block') { el.style.display = 'none'; return; }
+            const it = getSavedItineraries().find(i => i.id === id);
+            if (!it) return;
+            const rawHtml = it.htmlContent || (it.details && it.details.html) || '<em>Sin contenido guardado.</em>';
+            el.innerHTML = rawHtml.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\*(.*?)\*/g,'<i>$1</i>');
+            el.style.display = 'block';
+        }
+
+        function downloadProfileItineraryPDF(id) {
+            const it = getSavedItineraries().find(i => i.id === id);
+            if (!it) return;
+            const rawHtml = it.htmlContent || (it.details && it.details.html) || '';
+            if (!rawHtml) { showToast('Sin contenido HTML para exportar', 'error'); return; }
+            const tempDiv = document.createElement('div');
+            tempDiv.id = 'profile-pdf-' + id;
+            tempDiv.style.cssText = 'background:#fff;color:#000;padding:40px;font-family:Arial,sans-serif;width:800px;position:fixed;left:-9999px;top:0;';
+            tempDiv.innerHTML = '<h1 style="color:#0E2A47;">✈️ ' + (it.destName || 'Itinerario') + '</h1>' + rawHtml.replace(/\n/g,'<br>');
+            document.body.appendChild(tempDiv);
+            downloadGeminiPDF('profile-pdf-' + id, 'TravelSense_' + (it.destName || 'Itinerario') + '.pdf');
+            setTimeout(() => { if (document.body.contains(tempDiv)) document.body.removeChild(tempDiv); }, 5000);
+        }
+
+        function deleteProfileItinerary(id) {
+            if (!confirm('¿Eliminar este itinerario?')) return;
+            const itins = getSavedItineraries().filter(i => i.id !== id);
+            localStorage.setItem('travelsense_itineraries', JSON.stringify(itins));
+            updateUserStats();
+            renderProfileItineraries();
+            showToast('Itinerario eliminado', 'info');
         }
 
 
@@ -4604,8 +4671,9 @@ function haversine(lat1, lon1, lat2, lon2) {
         function saveChecklist(destId, destName, dateStr) {
             let checklists = getSavedChecklists();
             const items = window.currentChecklistItems || {};
+            const html = window.currentChecklistHtml || null;
 
-            // Allow multiple checklists per destination if dates differ, simpler logic here just checks exactly same day
+            // Allow multiple checklists per destination if dates differ
             if (checklists.some(c => c.destId === destId.toString() && c.dateStr === dateStr)) {
                 showToast(`Ya tienes una lista guardada para esta fecha en ${destName}`, 'warning');
                 return;
@@ -4617,13 +4685,15 @@ function haversine(lat1, lon1, lat2, lon2) {
                 destName: destName,
                 dateStr: dateStr,
                 dateSaved: new Date().toLocaleDateString(),
-                items: items
+                items: items,
+                html: html  // Save the Gemini-generated HTML
             };
 
             checklists.push(newList);
             localStorage.setItem('travelsense_checklists', JSON.stringify(checklists));
+            window.currentChecklistHtml = null; // reset
 
-            showToast(`Checklist para ${destName} guardado en Mi Perfil`, 'success');
+            showToast(`\u2705 Checklist para ${destName} guardada en Mi Perfil`, 'success');
 
             if (document.getElementById('profile').classList.contains('active')) {
                 renderProfileChecklists();
@@ -4789,12 +4859,12 @@ function haversine(lat1, lon1, lat2, lon2) {
                     <div style="margin:-30px -30px 20px -30px; height:200px; background:url('${imgStr}') center/cover; position:relative; border-radius:16px 16px 0 0;">
                         <div style="position:absolute; bottom:20px; left:20px; color:white; text-shadow:1px 1px 3px rgba(0,0,0,0.8);">
                             <h2 style="margin:0; font-size:2.5rem;">${it.destName}</h2>
-                            <div style="font-size:1.1rem; opacity:0.9;">Generado (Versi�n Previa)</div>
+                            <div style="font-size:1.1rem; opacity:0.9;">Generado (Versión Previa)</div>
                         </div>
                     </div>
                     <div style="padding: 20px; text-align: center; color: var(--brand-orange);">
                         <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>Este itinerario fue generado con una versi�n anterior y no tiene formato avanzado.</p>
+                        <p>Este itinerario fue generado con una versión anterior y no tiene formato avanzado.</p>
                     </div>
                 `;
             } else {
@@ -4805,7 +4875,7 @@ function haversine(lat1, lon1, lat2, lon2) {
             modal.style.display = "flex";
         }
 
-                function showChecklistDetails(id) {
+        function showChecklistDetails(id) {
             const checklists = getSavedChecklists();
             const it = checklists.find(c => c.id === id);
             if (!it) return;
@@ -4814,12 +4884,47 @@ function haversine(lat1, lon1, lat2, lon2) {
             const content = document.getElementById("details-modal-content");
 
             if (it.html) {
-                content.innerHTML = `<div style="padding: 10px;">${it.html}</div>`;
-            } else {
+                // New format: Gemini-generated HTML
                 content.innerHTML = `
-                    <div style="padding: 20px; text-align: center; color: var(--brand-orange);">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>Esta checklist fue generada con una versi�n anterior y no se puede mostrar en formato avanzado.</p>
+                    <div style="margin-bottom:16px;">
+                        <h2 style="margin:0 0 4px;color:var(--text-header);"><i class="fas fa-suitcase-rolling" style="color:var(--brand-teal);margin-right:8px;"></i>Equipaje — ${it.destName}</h2>
+                        <div style="font-size:0.82rem;color:var(--text-muted);"><i class="far fa-calendar"></i> ${it.dateStr} &nbsp;·&nbsp; Guardada: ${it.dateSaved}</div>
+                    </div>
+                    <div style="padding:10px;">${it.html}</div>`;
+            } else if (it.items && Object.keys(it.items).length > 0) {
+                // Old format: render items object as categorized list
+                let itemsHtml = '';
+                Object.entries(it.items).forEach(([category, itemList]) => {
+                    const list = Array.isArray(itemList) ? itemList : Object.values(itemList);
+                    if (!list.length) return;
+                    itemsHtml += `<div style="margin-bottom:18px;">
+                        <h3 style="color:var(--brand-teal);margin:0 0 8px;font-size:1rem;text-transform:capitalize;">
+                            <i class="fas fa-tag" style="margin-right:6px;"></i>${category}
+                        </h3>
+                        <div style="display:flex;flex-direction:column;gap:6px;">`;
+                    list.forEach(item => {
+                        const label = typeof item === 'string' ? item : (item.name || item.label || JSON.stringify(item));
+                        const checked = item.checked ? 'checked' : '';
+                        itemsHtml += `<label style="display:flex;align-items:center;gap:8px;color:var(--text-main);font-size:0.9rem;">
+                            <input type="checkbox" ${checked} style="accent-color:var(--brand-teal);width:16px;height:16px;">
+                            ${label}
+                        </label>`;
+                    });
+                    itemsHtml += `</div></div>`;
+                });
+                content.innerHTML = `
+                    <div style="margin-bottom:16px;">
+                        <h2 style="margin:0 0 4px;color:var(--text-header);"><i class="fas fa-suitcase-rolling" style="color:var(--brand-teal);margin-right:8px;"></i>Equipaje — ${it.destName}</h2>
+                        <div style="font-size:0.82rem;color:var(--text-muted);"><i class="far fa-calendar"></i> ${it.dateStr} &nbsp;·&nbsp; Guardada: ${it.dateSaved}</div>
+                    </div>
+                    <div style="padding:10px;">${itemsHtml || '<p style="color:var(--text-muted);">Sin items guardados.</p>'}</div>`;
+            } else {
+                // Truly empty checklist
+                content.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                        <i class="fas fa-suitcase-rolling" style="font-size:3rem;opacity:0.3;display:block;margin-bottom:12px;"></i>
+                        <p>Esta checklist no tiene contenido guardado.</p>
+                        <p style="font-size:0.85rem;">Genera una nueva desde <b>Herramientas IA → Asistente de Equipaje</b>.</p>
                     </div>`;
             }
 
@@ -4827,10 +4932,40 @@ function haversine(lat1, lon1, lat2, lon2) {
         }
 
         function changeAvatar() {
-            const url = prompt("Introduce la URL de tu nueva imagen:", document.getElementById('profile-avatar-preview').src);
-            if (url) {
-                document.getElementById('profile-avatar-preview').src = url;
-            }
+            // Trigger file picker
+            document.getElementById('avatar-file-input')?.click();
+        }
+
+        function handleAvatarFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            applyAvatarFile(file);
+        }
+
+        function handleAvatarDrop(event) {
+            event.preventDefault();
+            const zone = document.getElementById('avatar-drop-zone');
+            if (zone) { zone.style.borderColor = ''; zone.style.background = ''; }
+            const file = event.dataTransfer?.files?.[0];
+            if (!file || !file.type.startsWith('image/')) { showToast('Arrastra una imagen v\u00e1lida', 'warning'); return; }
+            applyAvatarFile(file);
+        }
+
+        function applyAvatarFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                ['profile-avatar-preview','header-avatar','profile-page-avatar'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.src = base64;
+                });
+                const profile = JSON.parse(localStorage.getItem('travelsense_profile') || '{}'  );
+                profile.avatar = base64;
+                localStorage.setItem('travelsense_profile', JSON.stringify(profile));
+                saveCurrentUserData();
+                showToast('Foto de perfil actualizada', 'success');
+            };
+            reader.readAsDataURL(file);
         }
 
         function updateUIWithProfile(profile) {
@@ -4861,29 +4996,36 @@ function haversine(lat1, lon1, lat2, lon2) {
             if (headerAvatar) headerAvatar.src = profile.avatar;
         }
 
-        // --- Privacy Toggles ---
+        // --- Privacy Toggles (canonical, uses showFavs/showItin/showPassport/showChecklist) ---
         function getPrivacy() {
-            return JSON.parse(localStorage.getItem('ts_privacy') || '{"favs":true,"itin":true,"passport":true,"check":false}');
+            const p = JSON.parse(localStorage.getItem('ts_privacy') || '{}');
+            return {
+                showFavs:      p.showFavs      !== false,
+                showItin:      p.showItin      !== false,
+                showPassport:  p.showPassport  !== false,
+                showChecklist: p.showChecklist === true
+            };
         }
 
         function savePrivacy() {
-            const p = {
-                favs: document.getElementById('priv-favs') ? document.getElementById('priv-favs').checked : true,
-                itin: document.getElementById('priv-itin') ? document.getElementById('priv-itin').checked : true,
-                passport: document.getElementById('priv-passport') ? document.getElementById('priv-passport').checked : true,
-                check: document.getElementById('priv-check') ? document.getElementById('priv-check').checked : false
+            const privacy = {
+                showFavs:      document.getElementById('priv-favs')?.checked !== false,
+                showItin:      document.getElementById('priv-itin')?.checked !== false,
+                showPassport:  document.getElementById('priv-passport')?.checked !== false,
+                showChecklist: document.getElementById('priv-check')?.checked === true
             };
-            localStorage.setItem('ts_privacy', JSON.stringify(p));
+            localStorage.setItem('ts_privacy', JSON.stringify(privacy));
             saveCurrentUserData();
-            showToast('Privacidad actualizada', 'success');
+            showToast('Privacidad actualizada ✅', 'success');
         }
 
         function loadPrivacyToggles() {
             const p = getPrivacy();
-            if (document.getElementById('priv-favs')) document.getElementById('priv-favs').checked = p.favs;
-            if (document.getElementById('priv-itin')) document.getElementById('priv-itin').checked = p.itin;
-            if (document.getElementById('priv-passport')) document.getElementById('priv-passport').checked = p.passport;
-            if (document.getElementById('priv-check')) document.getElementById('priv-check').checked = p.check;
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val; };
+            set('priv-favs',      p.showFavs);
+            set('priv-itin',      p.showItin);
+            set('priv-passport',  p.showPassport);
+            set('priv-check',     p.showChecklist);
         }
 
         // --- Copy Resources ---
@@ -4936,46 +5078,80 @@ function haversine(lat1, lon1, lat2, lon2) {
                 });
             }
             
-            const community = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
-            community.forEach(u => {
+            // --- PRIMARY: Pull real users from the BACKEND (shared across ALL devices/browsers) ---
+            let backendUsers = [];
+            try {
+                const ctrl = new AbortController();
+                const to = setTimeout(() => ctrl.abort(), 4000);
+                const r = await fetch(`${API_BASE}/users`, {signal: ctrl.signal});
+                clearTimeout(to);
+                backendUsers = await r.json();
+            } catch(e) { backendUsers = []; }
+            
+            const COLORS = ['6c5ce7','e17055','0984e3','fd79a8','a29bfe','00b894','fdcb6e'];
+            const BIOS = ['Apasionado/a de los viajes.', 'Mochilero/a con 20+ países.', 'Amante de la gastronomía local.', 'Fan del senderismo y aventura.', 'Explorador/a urbano/a.'];
+            
+            if (Array.isArray(backendUsers)) {
+                backendUsers.forEach((u, i) => {
+                    if (!u.nombre) return;
+                    if (u.email && u.email === currEmail) return; // skip self
+                    if (u.email === 'demo@travelsense.com' || u.email === 'guest@travelsense.local') return;
+                    
+                    const localEntry = JSON.parse(localStorage.getItem('ts_community_registry') || '[]')
+                        .find(c => c.email === u.email);
+                    
+                    // Read real visited/favorites counts from local namespace if same device
+                    let visitedCount = 0, favsCount = 0;
+                    if (localEntry && localEntry.ns) {
+                        try {
+                            visitedCount = JSON.parse(localStorage.getItem(localEntry.ns + 'travelsense_visited') || '[]').length;
+                            favsCount = JSON.parse(localStorage.getItem(localEntry.ns + 'travelsense_favorites') || '[]').length;
+                        } catch(e) {}
+                    }
+                    
+                    realTravelers.push({
+                        id: 'backend-' + u.id,
+                        email: u.email,
+                        name: localEntry?.nombre || u.nombre,
+                        avatar: localEntry?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.nombre)}&background=${COLORS[i % COLORS.length]}&color=fff`,
+                        city: localEntry?.city || 'España',
+                        bio: localEntry?.bio || BIOS[i % BIOS.length],
+                        budget: localEntry?.budget || 'Medio',
+                        travelStyles: localEntry?.travelStyles || [],
+                        visited: visitedCount,
+                        favorites: favsCount,
+                        isReal: true,
+                        ns: localEntry?.ns || null
+                    });
+                });
+            }
+            
+            // SECONDARY: Local-only community members (same device, not yet in backend)
+            const localCommunity = JSON.parse(localStorage.getItem('ts_community_registry') || '[]');
+            localCommunity.forEach(u => {
                 if (u.email === currEmail) return;
+                if (realTravelers.some(t => t.email === u.email)) return; // already added
                 let v = 0, f = 0;
                 try {
                     v = JSON.parse(localStorage.getItem(u.ns + 'travelsense_visited') || '[]').length;
                     f = JSON.parse(localStorage.getItem(u.ns + 'travelsense_favorites') || '[]').length;
                 } catch(e) {}
                 realTravelers.push({
-                    id: 'real-' + u.email, name: u.nombre, avatar: u.avatar,
+                    id: 'local-' + u.email, name: u.nombre, avatar: u.avatar,
                     city: u.city || 'Desconocido', bio: u.bio || 'Viajero de TravelSense',
                     budget: u.budget || 'Medio', travelStyles: u.travelStyles || [],
                     visited: v, favorites: f, isReal: true, ns: u.ns, email: u.email
                 });
             });
             
-            let apiUsers = [];
-            try {
-                const ctrl = new AbortController();
-                const to = setTimeout(() => ctrl.abort(), 3000);
-                const r = await fetch(`${API_BASE}/users`, {signal: ctrl.signal});
-                clearTimeout(to);
-                apiUsers = await r.json();
-            } catch(e) { apiUsers = []; }
-            
-            const COLORS = ['6c5ce7','e17055','0984e3','fd79a8','a29bfe'];
-            const BIOS = ['Apasionado/a de los viajes.','Mochilero/a con 20+ paises.','Amante de la gastronomía local.','Fan del senderismo y aventura.','Explorador/a urbano/a.'];
-            const realNames = realTravelers.map(r => r.name.toLowerCase());
-            
-            const generated = (Array.isArray(apiUsers) ? apiUsers : []).slice(0, 12)
-                .filter(u => !realNames.includes(u.nombre.toLowerCase()))
-                .map((u, i) => ({
-                    id: 'api-' + u.id, name: u.nombre,
-                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(u.nombre)}&background=${COLORS[i%5]}&color=fff`,
-                    city: u.pais || 'España', bio: BIOS[i%BIOS.length], budget: 'Medio', travelStyles: [],
-                    visited: Math.floor(Math.random() * 15) + 1, favorites: Math.floor(Math.random() * 10) + 1,
-                    isReal: false
-                }));
-                
-            allTravelers = [...realTravelers, ...generated];
+            // Sort: me first → same-device users (have ns, most data) → backend-only → local-only
+            allTravelers = [
+                ...realTravelers.filter(t => t.id === 'me'),
+                ...realTravelers.filter(t => t.id !== 'me' && t.ns !== null && t.id.startsWith('backend-')),
+                ...realTravelers.filter(t => t.id !== 'me' && t.ns !== null && t.id.startsWith('local-')),
+                ...realTravelers.filter(t => t.id !== 'me' && t.ns === null && t.id.startsWith('backend-')),
+                ...realTravelers.filter(t => t.id !== 'me' && t.ns === null && !t.id.startsWith('backend-'))
+            ];
             
             try {
                 renderTravelers(allTravelers);
@@ -5048,7 +5224,28 @@ function haversine(lat1, lon1, lat2, lon2) {
             const following = isFollowing(traveler.id);
             const isMe = traveler.id === 'me';
             const ns = traveler.ns || null;
-            const priv = isMe ? {favs:true,itin:true,passport:true,check:true} : getPrivacy();
+            
+            // Privacy: for own profile use actual settings.
+            // For same-device users: read from their namespaced ts_privacy.
+            // For cross-device users: default all PUBLIC (can't access their localStorage).
+            let priv = { showFavs: true, showItin: true, showPassport: true, showChecklist: true };
+            if (isMe) {
+                priv = getPrivacy();
+            } else if (ns) {
+                try {
+                    const stored = localStorage.getItem(ns + 'ts_privacy');
+                    if (stored) {
+                        const raw = JSON.parse(stored);
+                        // Support both old key format (favs) and new (showFavs)
+                        priv = {
+                            showFavs:      raw.showFavs      !== undefined ? raw.showFavs      : (raw.favs      !== undefined ? raw.favs      : true),
+                            showItin:      raw.showItin      !== undefined ? raw.showItin      : (raw.itin      !== undefined ? raw.itin      : true),
+                            showPassport:  raw.showPassport  !== undefined ? raw.showPassport  : (raw.passport  !== undefined ? raw.passport  : true),
+                            showChecklist: raw.showChecklist !== undefined ? raw.showChecklist : (raw.check     !== undefined ? raw.check     : false)
+                        };
+                    }
+                } catch(e) {}
+            }
 
             // Resolve data sources: real namespace data, or current user data (me), or empty (generated)
             const activeFavs = isMe ? getFavorites() : (ns ? JSON.parse(localStorage.getItem(ns+'travelsense_favorites')||'[]') : []);
@@ -5059,7 +5256,7 @@ function haversine(lat1, lon1, lat2, lon2) {
             const locked = '<div style="text-align:center;padding:30px;color:var(--text-muted);"><i class="fas fa-lock" style="font-size:2rem;opacity:0.4;display:block;margin-bottom:10px;"></i>Contenido privado</div>';
 
             function buildFavoritesHtml() {
-                if (!priv.favs && !isMe) return locked;
+                if (!priv.showFavs && !isMe) return locked;
                 const dests = (window.allDestinations||[]).filter(d => activeFavs.includes(d.id.toString()));
                 if (!dests.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Sin favoritos guardados.</p>';
                 return '<div class="dashboard-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">' + dests.map(d => `
@@ -5071,24 +5268,29 @@ function haversine(lat1, lon1, lat2, lon2) {
             }
 
             function buildItinHtml() {
-                if (!priv.itin && !isMe) return locked;
+                if (!priv.showItin && !isMe) return locked;
                 if (!activeItins.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Sin itinerarios guardados.</p>';
-                return activeItins.map(it => `
+                return activeItins.map((it, idx) => {
+                    const uid = 'tp-itin-expand-' + idx;
+                    const hasHtml = !!(it.htmlContent || it.html);
+                    const rawHtml = it.htmlContent || it.html || '';
+                    return `
                     <div style="background:var(--badge-bg);border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid var(--brand-teal);">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                            <b style="color:var(--text-header);">${it.destName}</b>
-                            <span class="badge" style="background:var(--brand-teal);color:white;border:none;">${it.duration||'?'} dias</span>
+                            <b style="color:var(--text-header);">✈️ ${it.destName}</b>
+                            <span class="badge" style="background:var(--brand-teal);color:white;border:none;">${it.duration||'?'} días</span>
                         </div>
-                        <div style="color:var(--text-muted);font-size:0.82rem;margin-bottom:8px;"><i class="fas fa-tag"></i> ${it.budget||'estandar'}</div>
+                        <div style="color:var(--text-muted);font-size:0.82rem;margin-bottom:8px;"><i class="fas fa-tag"></i> ${it.budget||'estándar'} · ${it.date||''}</div>
                         <div style="display:flex;gap:6px;">
-                            ${isMe ? `<button class="populate-btn" onclick="showItineraryDetails('${it.id}')" style="flex:1;justify-content:center;background:transparent;border:1px solid var(--border-color);color:var(--text-main);box-shadow:none;font-size:0.78rem;padding:5px;"><i class="fas fa-eye"></i> Ver</button>` : ''}
-                            ${isMe && it.htmlContent ? `<button class="populate-btn" onclick="downloadGeminiPDF('saved-itin-print-${it.id}','TravelSense_${it.destName}.pdf')" style="background:transparent;border:1px solid var(--brand-orange);color:var(--brand-orange);box-shadow:none;font-size:0.78rem;padding:5px 8px;"><i class="fas fa-file-pdf"></i></button>` : ''}
+                            ${hasHtml ? `<button class="populate-btn" onclick="const el=document.getElementById('${uid}');el.style.display=el.style.display==='none'?'block':'none';this.innerHTML=el.style.display==='none'?'<i class=\'fas fa-eye\'></i> Ver itinerario':'<i class=\'fas fa-eye-slash\'></i> Ocultar'" style="flex:1;justify-content:center;background:transparent;border:1px solid var(--brand-teal);color:var(--brand-teal);box-shadow:none;font-size:0.78rem;padding:5px;"><i class="fas fa-eye"></i> Ver itinerario</button>` : '<span style="font-size:0.78rem;color:var(--text-muted);">Sin contenido HTML</span>'}
                         </div>
-                    </div>`).join('');
+                        ${hasHtml ? `<div id="${uid}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-color);font-size:0.88rem;max-height:350px;overflow-y:auto;">${rawHtml.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\*(.*?)\*/g,'<i>$1</i>')}</div>` : ''}
+                    </div>`;
+                }).join('');
             }
 
             function buildPassportHtml() {
-                if (!priv.passport && !isMe) return locked;
+                if (!priv.showPassport && !isMe) return locked;
                 if (!activeVisited.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Pasaporte vacio.</p>';
                 const totalKm = activeVisited.reduce((acc,v) => {
                     const d = (window.allDestinations||[]).find(d=>d.id.toString()===v.id);
@@ -5110,7 +5312,7 @@ function haversine(lat1, lon1, lat2, lon2) {
             }
 
             function buildCheckHtml() {
-                if (!priv.check && !isMe) return locked;
+                if (!priv.showChecklist && !isMe) return locked;
                 if (!activeChecks.length) return '<p style="color:var(--text-muted);text-align:center;padding:20px;">Sin checklists guardadas.</p>';
                 return activeChecks.map(c => `
                     <div style="background:var(--badge-bg);border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid var(--brand-orange);">
@@ -5264,10 +5466,47 @@ function haversine(lat1, lon1, lat2, lon2) {
         }
         
         function loginAsGuest() {
-            handleCredentialResponse({
-                credential: 'simulated_guest_token',
-                isGuest: true
-            });
+            const guestName = 'Viajero Invitado';
+            const guestEmail = 'guest@travelsense.local';
+            const guestAvatar = `https://ui-avatars.com/api/?name=Viajero&background=6c5ce7&color=fff`;
+
+            // Hide login overlay
+            const overlay = document.getElementById('login-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+
+            // Setup guest session locally (no backend needed)
+            const prevEmail = localStorage.getItem('ts_current_user_email');
+            if (guestEmail !== prevEmail) {
+                if (prevEmail) saveCurrentUserData();
+                USER_DATA_KEYS.forEach(k => localStorage.removeItem(k));
+                loadUserData(guestEmail);
+            } else {
+                loadUserData(guestEmail);
+            }
+
+            localStorage.setItem('ts_current_user_email', guestEmail);
+            localStorage.setItem('ts_login', 'true');
+
+            const savedProfile = JSON.parse(localStorage.getItem('travelsense_profile') || 'null');
+            if (savedProfile && savedProfile.name) {
+                updateUIWithProfile(savedProfile);
+            } else {
+                updateUIWithProfile({ name: guestName, avatar: guestAvatar });
+            }
+
+            loadUserProfile();
+            loadPrivacyToggles();
+            loadData();
+
+            const isNewUser = !localStorage.getItem('ts_onboarding_done');
+            if (isNewUser) {
+                setTimeout(() => showOnboarding(guestName), 600);
+            } else {
+                showToast(`¡Bienvenido de nuevo, ${savedProfile?.name || guestName}! 🌍`, 'success');
+                if (typeof updateUserStats === 'function') updateUserStats();
+                fetchDestinations();
+            }
         }
 
         // Initialize on load
@@ -5285,55 +5524,75 @@ function haversine(lat1, lon1, lat2, lon2) {
                 modal.style.display = "flex";
                 const nameInput = document.getElementById("ob-name");
                 if (nameInput && nombre) nameInput.value = nombre;
+                obGoStep(1);
             }
         }
 
-        function completeOnboarding() {
-            const name = document.getElementById("ob-name")?.value?.trim();
-            const city = document.getElementById("ob-city")?.value?.trim();
-            const budget = document.getElementById("ob-budget")?.value;
-            const styles = Array.from(document.querySelectorAll(".ob-style-btn.active")).map(b => b.innerText.trim());
-            
-            if (!name) { showToast("Escribe tu nombre", "warning"); return; }
-            
-            const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
-            profile.name = name;
-            profile.city = city || "N�mada Digital";
+        function obGoStep(step) {
+            // Validate step 1 before proceeding
+            if (step === 2) {
+                const name = document.getElementById('ob-name')?.value?.trim();
+                if (!name) {
+                    document.getElementById('ob-name').focus();
+                    document.getElementById('ob-name').style.borderColor = 'rgba(255,100,100,0.8)';
+                    document.getElementById('ob-name').placeholder = '¡Escribe tu nombre para continuar!';
+                    setTimeout(() => {
+                        document.getElementById('ob-name').style.borderColor = '';
+                        document.getElementById('ob-name').placeholder = 'Tu nombre o apodo...';
+                    }, 2500);
+                    return;
+                }
+            }
+            [1,2,3].forEach(s => {
+                const el = document.getElementById('ob-step-' + s);
+                const prog = document.getElementById('ob-prog-' + s);
+                if (el) el.classList.toggle('active', s === step);
+                if (prog) {
+                    prog.classList.remove('done', 'active');
+                    if (s < step) prog.classList.add('done');
+                    else if (s === step) prog.classList.add('active');
+                }
+            });
+        }
+
+        function selectObBudget(card) {
+            document.querySelectorAll('.ob-budget-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+        }
+
+        function completeOnboarding(skipAll) {
+            const name = document.getElementById('ob-name')?.value?.trim();
+            const city = document.getElementById('ob-city')?.value?.trim();
+            const activeCard = document.querySelector('.ob-budget-card.active');
+            const budget = activeCard ? activeCard.getAttribute('data-budget') : 'medium';
+            const styles = Array.from(document.querySelectorAll('.ob-style-chip.active')).map(b => b.innerText.trim());
+
+            if (!skipAll && !name) { showToast('Escribe tu nombre para continuar', 'warning'); obGoStep(1); return; }
+
+            const profile = JSON.parse(localStorage.getItem('travelsense_profile') || '{}');
+            profile.name = name || profile.name || 'Viajero';
+            profile.city = city || profile.city || 'Nomada Digital';
             profile.budget = budget;
             profile.travelStyles = styles;
-            localStorage.setItem("travelsense_profile", JSON.stringify(profile));
-            localStorage.setItem("ts_onboarding_done", "true");
-            
+            localStorage.setItem('travelsense_profile', JSON.stringify(profile));
+            localStorage.setItem('ts_onboarding_done', 'true');
+
             saveCurrentUserData();
             loadUserProfile();
-            document.getElementById("onboarding-modal").style.display = "none";
-            showToast(`�Bienvenido, ${name}! Todo listo ??`, "success");
+
+            const modal = document.getElementById('onboarding-modal');
+            modal.style.transition = 'opacity 0.4s';
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.style.display = 'none'; modal.style.opacity = '1'; modal.style.transition = ''; }, 420);
+
+            showToast('Bienvenido, ' + (profile.name || 'Viajero') + '! Todo listo.', 'success');
         }
 
-        // ===== PRIVACY TOGGLES =====
-        function savePrivacy() {
-            const privacy = {
-                showFavs: document.getElementById("priv-favs")?.checked !== false,
-                showItin: document.getElementById("priv-itin")?.checked !== false,
-                showPassport: document.getElementById("priv-passport")?.checked !== false,
-                showChecklist: document.getElementById("priv-check")?.checked === true
-            };
-            localStorage.setItem("ts_privacy", JSON.stringify(privacy));
-            saveCurrentUserData();
-        }
-
-        function loadPrivacyToggles() {
-            const privacy = JSON.parse(localStorage.getItem("ts_privacy") || "{}");
-            const set = (id, val) => { const el = document.getElementById(id); if(el) el.checked = val !== false; };
-            set("priv-favs", privacy.showFavs !== false);
-            set("priv-itin", privacy.showItin !== false);
-            set("priv-passport", privacy.showPassport !== false);
-            set("priv-check", privacy.showChecklist === true);
-        }
+        // (savePrivacy and loadPrivacyToggles are defined above at getPrivacy)
 
         // ===== DELETE ACCOUNT =====
         function deleteAccount() {
-            if (!confirm("?? �SEGURO? Se borrar�n TODOS tus datos de este dispositivo. Esta acci�n no se puede deshacer.")) return;
+            if (!confirm("?? ¿SEGURO? Se borrarán TODOS tus datos de este dispositivo. Esta acción no se puede deshacer.")) return;
             const email = localStorage.getItem("ts_current_user_email");
             if (email) {
                 const ns = getUserNs(email);
@@ -5348,57 +5607,45 @@ function haversine(lat1, lon1, lat2, lon2) {
         }
 
         // ===== PROFILE AVATAR DRAG & DROP =====
+        function applyAvatarFile(file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const src = ev.target.result;
+                const preview = document.getElementById("profile-avatar-preview");
+                if (preview) preview.src = src;
+                const headerAvatar = document.getElementById("header-avatar");
+                if (headerAvatar) headerAvatar.src = src;
+                const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
+                profile.avatar = src;
+                localStorage.setItem("travelsense_profile", JSON.stringify(profile));
+                saveCurrentUserData();
+                showToast("Foto actualizada ✅", "success");
+            };
+            reader.readAsDataURL(file);
+        }
+
         function initAvatarDrop() {
             const zone = document.getElementById("avatar-drop-zone");
-            if (!zone) return;
-            zone.addEventListener("dragover", e => { e.preventDefault(); zone.style.borderColor = "var(--brand-teal)"; });
-            zone.addEventListener("dragleave", () => { zone.style.borderColor = "var(--border-color)"; });
+            if (!zone || zone.dataset.dropInited) return;
+            zone.dataset.dropInited = "1";
+            // Drag events only — click is handled by the inline onclick + #avatar-file-input in HTML
+            zone.addEventListener("dragover", e => { e.preventDefault(); zone.style.borderColor = "var(--brand-teal)"; zone.style.background = "rgba(0,184,148,0.08)"; });
+            zone.addEventListener("dragleave", () => { zone.style.borderColor = ""; zone.style.background = ""; });
             zone.addEventListener("drop", e => {
                 e.preventDefault();
-                zone.style.borderColor = "var(--border-color)";
+                zone.style.borderColor = "";
+                zone.style.background = "";
                 const file = e.dataTransfer.files[0];
-                if (!file || !file.type.startsWith("image/")) { showToast("Solo im�genes", "error"); return; }
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    const src = ev.target.result;
-                    const preview = document.getElementById("profile-avatar-preview");
-                    if (preview) preview.src = src;
-                    const headerAvatar = document.getElementById("header-avatar");
-                    if (headerAvatar) headerAvatar.src = src;
-                    // Save to profile
-                    const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
-                    profile.avatar = src;
-                    localStorage.setItem("travelsense_profile", JSON.stringify(profile));
-                    saveCurrentUserData();
-                    showToast("Foto actualizada ?", "success");
-                };
-                reader.readAsDataURL(file);
+                if (!file || !file.type.startsWith("image/")) { showToast("Solo imágenes", "error"); return; }
+                applyAvatarFile(file);
             });
-            // Also allow click to select file
-            zone.addEventListener("click", () => {
-                const input = document.createElement("input");
-                input.type = "file";
-                input.accept = "image/*";
-                input.onchange = e => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = ev => {
-                        const src = ev.target.result;
-                        const preview = document.getElementById("profile-avatar-preview");
-                        if (preview) preview.src = src;
-                        const headerAvatar = document.getElementById("header-avatar");
-                        if (headerAvatar) headerAvatar.src = src;
-                        const profile = JSON.parse(localStorage.getItem("travelsense_profile") || "{}");
-                        profile.avatar = src;
-                        localStorage.setItem("travelsense_profile", JSON.stringify(profile));
-                        saveCurrentUserData();
-                        showToast("Foto actualizada ?", "success");
-                    };
-                    reader.readAsDataURL(file);
-                };
-                input.click();
-            });
+        }
+
+        // Called by #avatar-file-input onchange="handleAvatarFile(this)"
+        function handleAvatarFile(input) {
+            const file = input?.files?.[0];
+            if (file) applyAvatarFile(file);
+            if (input) input.value = ""; // reset so same file can be re-selected
         }
 
         // ===== USER STATS UPDATE =====
@@ -5419,44 +5666,240 @@ function haversine(lat1, lon1, lat2, lon2) {
 
 
     <!-- Onboarding Modal -->
-    <div id="onboarding-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:99998; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
-        <div style="background:linear-gradient(135deg, #0E2A47, #051525); border:1px solid rgba(255,215,0,0.3); border-radius:24px; padding:40px; max-width:500px; width:90%; color:white; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
-            <div style="text-align:center; margin-bottom:30px;">
-                <i class="fas fa-globe-americas" style="font-size:3rem; color:#FFD700; margin-bottom:15px;"></i>
-                <h2 style="margin:0; color:#FFD700; font-size:2rem;">�Bienvenido a TravelSense!</h2>
-                <p style="color:rgba(255,255,255,0.7); margin:10px 0 0;">Cu�ntanos un poco sobre ti para personalizar tu experiencia</p>
+    <style>
+        #onboarding-modal { font-family: 'Outfit', sans-serif; }
+        .ob-step { display: none; animation: fadeIn 0.4s ease; }
+        .ob-step.active { display: block; }
+        .ob-card {
+            background: linear-gradient(145deg, #0d2137 0%, #071829 100%);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 28px;
+            padding: 44px 40px;
+            max-width: 520px;
+            width: 92%;
+            color: white;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .ob-card::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .ob-progress-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 36px;
+        }
+        .ob-prog-seg {
+            flex: 1;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.12);
+            transition: background 0.4s;
+        }
+        .ob-prog-seg.done { background: #FFD700; }
+        .ob-prog-seg.active { background: linear-gradient(90deg, #FFD700, #FF9F43); }
+        .ob-icon-circle {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px;
+            font-size: 1.8rem;
+        }
+        .ob-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .ob-input {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: white;
+            font-family: inherit;
+            font-size: 0.97rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .ob-input:focus {
+            border-color: rgba(255,215,0,0.5);
+            background: rgba(255,215,0,0.06);
+        }
+        .ob-input::placeholder { color: rgba(255,255,255,0.25); }
+        .ob-style-chip {
+            padding: 9px 16px;
+            border-radius: 30px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.7);
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ob-style-chip:hover { border-color: rgba(255,215,0,0.4); color: #FFD700; }
+        .ob-style-chip.active {
+            background: rgba(255,215,0,0.15);
+            border-color: #FFD700;
+            color: #FFD700;
+            box-shadow: 0 0 12px rgba(255,215,0,0.2);
+        }
+        .ob-budget-card {
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .ob-budget-card:hover { border-color: rgba(255,215,0,0.3); }
+        .ob-budget-card.active {
+            border-color: #FFD700;
+            background: rgba(255,215,0,0.1);
+        }
+        .ob-budget-icon { font-size: 1.6rem; }
+        .ob-btn-primary {
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, #FFD700, #FF9F43);
+            color: #000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 6px 24px rgba(255,215,0,0.3);
+        }
+        .ob-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,215,0,0.4); }
+        .ob-btn-secondary {
+            background: none; border: none; color: rgba(255,255,255,0.4);
+            font-family: inherit; font-size: 0.85rem; cursor: pointer; padding: 8px;
+            transition: color 0.2s;
+        }
+        .ob-btn-secondary:hover { color: rgba(255,255,255,0.7); }
+    </style>
+    <div id="onboarding-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(2,11,20,0.85); z-index:99998; align-items:center; justify-content:center; backdrop-filter:blur(12px);">
+        <div class="ob-card">
+            <!-- Progress Bar -->
+            <div class="ob-progress-bar">
+                <div class="ob-prog-seg active" id="ob-prog-1"></div>
+                <div class="ob-prog-seg" id="ob-prog-2"></div>
+                <div class="ob-prog-seg" id="ob-prog-3"></div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                <div>
-                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:5px; display:block;">�C�mo te gustar�a que te llamemos?</label>
-                    <input id="ob-name" type="text" placeholder="Tu nombre..." style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:white; font-family:inherit; outline:none; box-sizing:border-box;">
+
+            <!-- STEP 1: Name + City -->
+            <div class="ob-step active" id="ob-step-1">
+                <div class="ob-icon-circle" style="background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,159,67,0.1));">
+                    &#127758;
                 </div>
-                <div>
-                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:5px; display:block;">Ciudad de origen</label>
-                    <input id="ob-city" type="text" placeholder="Ej: Madrid, Barcelona..." style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:white; font-family:inherit; outline:none; box-sizing:border-box;">
+                <div style="text-align:center; margin-bottom:28px;">
+                    <div style="font-size:0.75rem; letter-spacing:3px; text-transform:uppercase; color:rgba(255,215,0,0.6); margin-bottom:8px;">Paso 1 de 3</div>
+                    <h2 style="margin:0 0 8px; font-size:1.75rem; font-weight:700;">&#161;Bienvenido a TravelSense!</h2>
+                    <p style="color:rgba(255,255,255,0.5); margin:0; font-size:0.92rem;">Cu&eacute;ntanos un poco sobre ti para personalizar tu experiencia.</p>
                 </div>
-                <div>
-                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:8px; display:block;">Estilo de viaje preferido</label>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">??? Playa</button>
-                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">?? Monta�a</button>
-                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">??? Cultura</button>
-                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">?? Aventura</button>
-                        <button class="ob-style-btn filter-btn" onclick="this.classList.toggle('active')">??? Gastronom�a</button>
+                <div style="display:flex; flex-direction:column; gap:18px;">
+                    <div>
+                        <span class="ob-label">&#128100; &iquest;C&oacute;mo te llamamos?</span>
+                        <input id="ob-name" class="ob-input" type="text" placeholder="Tu nombre o apodo...">
+                    </div>
+                    <div>
+                        <span class="ob-label">&#128205; Ciudad de origen</span>
+                        <input id="ob-city" class="ob-input" type="text" placeholder="Ej: Madrid, Barcelona, Valencia...">
                     </div>
                 </div>
-                <div>
-                    <label style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:5px; display:block;">Presupuesto habitual</label>
-                    <select id="ob-budget" style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(14,42,71,0.8); color:white; font-family:inherit; outline:none;">
-                        <option value="low">?? Econ�mico (Mochilero)</option>
-                        <option value="medium" selected>?? Est�ndar (Confort)</option>
-                        <option value="high">?? Lujo (Premium)</option>
-                    </select>
+                <button class="ob-btn-primary" onclick="obGoStep(2)" style="margin-top:28px;">
+                    Continuar <span>&#8594;</span>
+                </button>
+                <div style="text-align:center; margin-top:12px;">
+                    <button class="ob-btn-secondary" onclick="completeOnboarding(true)">Saltar configuraci&oacute;n</button>
                 </div>
             </div>
-            <button class="populate-btn" onclick="completeOnboarding()" style="width:100%; justify-content:center; margin-top:25px; background:linear-gradient(135deg,#FFD700,#FF9F43); color:#000; font-weight:700; font-size:1.1rem; padding:15px;">
-                <i class="fas fa-rocket"></i> �Empezar a Explorar!
-            </button>
+
+            <!-- STEP 2: Travel Styles -->
+            <div class="ob-step" id="ob-step-2">
+                <div class="ob-icon-circle" style="background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(0,184,148,0.1));">
+                    &#9889;
+                </div>
+                <div style="text-align:center; margin-bottom:28px;">
+                    <div style="font-size:0.75rem; letter-spacing:3px; text-transform:uppercase; color:rgba(255,215,0,0.6); margin-bottom:8px;">Paso 2 de 3</div>
+                    <h2 style="margin:0 0 8px; font-size:1.75rem; font-weight:700;">Tu estilo de viaje</h2>
+                    <p style="color:rgba(255,255,255,0.5); margin:0; font-size:0.92rem;">Selecciona todo lo que te llame la atenci&oacute;n (puedes elegir varios).</p>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#127944; Playa y Sol</button>
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#9968;&#65039; Monta&ntilde;a</button>
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#127963;&#65039; Cultura e Historia</button>
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#127939; Aventura</button>
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#127869;&#65039; Gastronom&iacute;a</button>
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#127749; Naturaleza</button>
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#127881; Vida Nocturna</button>
+                    <button class="ob-style-chip" onclick="this.classList.toggle('active')">&#129530; Bienestar</button>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:28px;">
+                    <button class="ob-btn-secondary" onclick="obGoStep(1)" style="flex:0 0 auto; padding:15px 20px; border:1px solid rgba(255,255,255,0.1); border-radius:14px;">&#8592;</button>
+                    <button class="ob-btn-primary" onclick="obGoStep(3)" style="flex:1;">
+                        Continuar <span>&#8594;</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Budget -->
+            <div class="ob-step" id="ob-step-3">
+                <div class="ob-icon-circle" style="background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(0,184,148,0.1));">
+                    &#128181;
+                </div>
+                <div style="text-align:center; margin-bottom:28px;">
+                    <div style="font-size:0.75rem; letter-spacing:3px; text-transform:uppercase; color:rgba(255,215,0,0.6); margin-bottom:8px;">Paso 3 de 3</div>
+                    <h2 style="margin:0 0 8px; font-size:1.75rem; font-weight:700;">Presupuesto habitual</h2>
+                    <p style="color:rgba(255,255,255,0.5); margin:0; font-size:0.92rem;">&iquest;C&oacute;mo sueles viajar? La IA usar&aacute; esto para personalizar sus recomendaciones.</p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:12px;" id="ob-budget-cards">
+                    <div class="ob-budget-card" data-budget="low" onclick="selectObBudget(this)">
+                        <div class="ob-budget-icon">&#127950;</div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.97rem;">Mochilero</div>
+                            <div style="font-size:0.78rem; color:rgba(255,255,255,0.4); margin-top:2px;">Albergues, transporte p&uacute;blico, experiencias locales</div>
+                        </div>
+                    </div>
+                    <div class="ob-budget-card active" data-budget="medium" onclick="selectObBudget(this)">
+                        <div class="ob-budget-icon">&#127968;</div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.97rem;">Est&aacute;ndar</div>
+                            <div style="font-size:0.78rem; color:rgba(255,255,255,0.4); margin-top:2px;">Hoteles 3-4 estrellas, mix de restaurantes</div>
+                        </div>
+                    </div>
+                    <div class="ob-budget-card" data-budget="high" onclick="selectObBudget(this)">
+                        <div class="ob-budget-icon">&#10024;</div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.97rem;">Premium</div>
+                            <div style="font-size:0.78rem; color:rgba(255,255,255,0.4); margin-top:2px;">Hoteles boutique, restaurantes gourmet, primera clase</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:28px;">
+                    <button class="ob-btn-secondary" onclick="obGoStep(2)" style="flex:0 0 auto; padding:15px 20px; border:1px solid rgba(255,255,255,0.1); border-radius:14px;">&#8592;</button>
+                    <button class="ob-btn-primary" onclick="completeOnboarding(false)" style="flex:1;">
+                        &#128640; &#161;Empezar a Explorar!
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Floating Chatbot UI -->
@@ -5467,7 +5910,7 @@ function haversine(lat1, lon1, lat2, lon2) {
                 <i class="fas fa-times" style="cursor:pointer" onclick="toggleChat()"></i>
             </div>
             <div class="chat-messages" id="chat-messages">
-                <div class="msg bot">¡Hola! Soy tu asistente de viajes inteligente. ¿A dónde te gustaría viajar o qué dudas tienes sobre tu próximo destino?</div>
+                <div class="msg bot">&iexcl;Hola! Soy tu asistente de viajes inteligente. &iquest;A d&oacute;nde te gustar&iacute;a viajar o qu&eacute; dudas tienes sobre tu pr&oacute;ximo destino?</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="chat-input" class="chat-input" placeholder="Pregunta algo..." onkeypress="if(event.key==='Enter') sendChatMessage()">

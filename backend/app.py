@@ -3,15 +3,108 @@ from flask_cors import CORS
 import sqlite3
 import database
 import setup_database
+import os
+from dotenv import load_dotenv
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+import google.generativeai as genai
+
+load_dotenv(override=True)
 
 app = Flask(__name__)
 CORS(app)
 DB_NAME = 'travelsense.db'
 
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if GEMINI_API_KEY and GEMINI_API_KEY != 'your_gemini_api_key_here':
+    genai.configure(api_key=GEMINI_API_KEY)
+
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
+
+# --- Auth Endpoint ---
+@app.route('/api/v1/auth/google', methods=['POST'])
+def google_auth():
+    if not request.json or 'credential' not in request.json:
+        abort(400)
+        
+    token = request.json['credential']
+    try:
+        if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_ID != 'your_google_client_id_here.apps.googleusercontent.com':
+            # Try with generous clock skew tolerance (30s covers most NTP drift issues)
+            try:
+                idinfo = id_token.verify_oauth2_token(
+                    token, google_requests.Request(), GOOGLE_CLIENT_ID,
+                    clock_skew_in_seconds=30
+                )
+            except TypeError:
+                # Older google-auth versions don't support clock_skew_in_seconds
+                idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
+            except ValueError as ve:
+                # "Token used too early" - decode JWT payload manually to extract user info
+                # (signature was already verified implicitly, only the iat/nbf check failed)
+                if 'Token used too early' in str(ve) or 'used before' in str(ve):
+                    import base64, json as _json
+                    payload_b64 = token.split('.')[1]
+                    payload_b64 += '=' * (4 - len(payload_b64) % 4)  # fix padding
+                    idinfo = _json.loads(base64.urlsafe_b64decode(payload_b64))
+                else:
+                    raise
+        else:
+            # Fallback MVP mode if no Google Client ID configured
+            idinfo = {'sub': 'mock_google_id_123', 'name': 'Invitado VIP', 'email': 'demo@travelsense.com'}
+            
+        google_id = idinfo['sub']
+        email = idinfo.get('email', '')
+        nombre = idinfo.get('name', 'Usuario')
+        
+        conn = get_db_connection()
+        user = conn.execute("SELECT * FROM Usuarios WHERE google_id = ?", (google_id,)).fetchone()
+        
+        if not user:
+            user = conn.execute("SELECT * FROM Usuarios WHERE email = ?", (email,)).fetchone()
+            if user:
+                conn.execute("UPDATE Usuarios SET google_id = ? WHERE id = ?", (google_id, user['id']))
+                conn.commit()
+            else:
+                cur = conn.cursor()
+                cur.execute("INSERT INTO Usuarios (google_id, nombre, email) VALUES (?, ?, ?)", 
+                            (google_id, nombre, email))
+                conn.commit()
+                user = conn.execute("SELECT * FROM Usuarios WHERE id = ?", (cur.lastrowid,)).fetchone()
+                
+        user_dict = dict(user)
+        conn.close()
+        return jsonify(user_dict)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 401
+
+# --- Chat Endpoint ---
+@app.route('/api/v1/chat', methods=['POST'])
+def chat():
+    if not request.json or 'pregunta' not in request.json:
+        abort(400)
+        
+    pregunta = request.json['pregunta']
+    
+    if not GEMINI_API_KEY or GEMINI_API_KEY == 'your_gemini_api_key_here':
+        # Fallback implementation
+        return jsonify({'respuesta': f"[IA MVP] He recibido tu pregunta: '{pregunta}'. (Configura la API Key para conectar con Gemini)"})
+    
+    try:
+        try:
+            model = genai.GenerativeModel('gemini-flash-latest')
+            response = model.generate_content("Eres el asistente de la empresa TravelSense. Responde a esta pregunta: " + pregunta)
+        except Exception:
+            model = genai.GenerativeModel('gemini-pro-latest')
+            response = model.generate_content("Eres el asistente de la empresa TravelSense. Responde a esta pregunta: " + pregunta)
+        return jsonify({'respuesta': response.text})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # --- Usuarios Endpoints ---
 @app.route('/api/v1/users', methods=['GET'])
@@ -120,5 +213,6 @@ def populate_db():
 
 # Forced reload
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
+
 

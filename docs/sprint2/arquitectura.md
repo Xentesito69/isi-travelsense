@@ -106,6 +106,8 @@ Importa este XML en https://app.diagrams.net/ → Extras → Edit Diagram:
 |---|---|---|
 | GET | `/api/v1/users` | Lista todos los usuarios |
 | POST | `/api/v1/users` | Crea un usuario |
+| POST | `/api/v1/auth/google` | Autenticación SSO vía Google Identity |
+| POST | `/api/v1/chat` | Chatbot interactivo usando LLM Gemini |
 | GET | `/api/v1/destinations` | Lista todos los destinos |
 | GET | `/api/v1/events` | Lista todos los eventos (con nombre de destino) |
 | GET | `/api/v1/itineraries` | Lista itinerarios con actividades |

@@ -18,6 +18,7 @@ def create_tables(conn):
     sql_create_usuarios = """
     CREATE TABLE IF NOT EXISTS Usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        google_id TEXT UNIQUE,
         nombre TEXT NOT NULL,
         email TEXT UNIQUE,
         preferencias TEXT,

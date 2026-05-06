@@ -1,0 +1,32 @@
+# Environment variables (contain secrets)
+backend/.env
+.env
+
+# SQLite databases
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+backend/__pycache__/
+
+# Frontend backup files
+frontend/index_backup*.html
+frontend/index_restored.html
+frontend/index_base.html
+
+# Revert/patch files
+revert.patch
+*.patch
+
+# OS files
+desktop.ini
+.DS_Store
+Thumbs.db
+
+# IDE workspace files
+*.code-workspace
+
+# Test/debug files
+backend/test_models.py
