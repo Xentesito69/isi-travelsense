@@ -3,5 +3,5 @@ flask-cors
 faker
 google-auth
 requests
-google-generativeai
+google-genai
 python-dotenv

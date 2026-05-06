@@ -7,19 +7,18 @@ import os
 from dotenv import load_dotenv
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-import google.generativeai as genai
+from google import genai as google_genai
 
 load_dotenv(override=True)
 
 app = Flask(__name__)
 CORS(app)
-DB_NAME = 'travelsense.db'
+DB_NAME = os.getenv('DB_PATH', 'travelsense.db')
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if GEMINI_API_KEY and GEMINI_API_KEY != 'your_gemini_api_key_here':
-    genai.configure(api_key=GEMINI_API_KEY)
+# El cliente de google-genai se instancia por petición (no necesita configure global)
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
@@ -96,12 +95,11 @@ def chat():
         return jsonify({'respuesta': f"[IA MVP] He recibido tu pregunta: '{pregunta}'. (Configura la API Key para conectar con Gemini)"})
     
     try:
-        try:
-            model = genai.GenerativeModel('gemini-flash-latest')
-            response = model.generate_content("Eres el asistente de la empresa TravelSense. Responde a esta pregunta: " + pregunta)
-        except Exception:
-            model = genai.GenerativeModel('gemini-pro-latest')
-            response = model.generate_content("Eres el asistente de la empresa TravelSense. Responde a esta pregunta: " + pregunta)
+        client = google_genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents="Eres el asistente de la empresa TravelSense. Responde en el mismo idioma en que te hablen. Pregunta: " + pregunta
+        )
         return jsonify({'respuesta': response.text})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

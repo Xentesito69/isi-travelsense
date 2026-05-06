@@ -1,0 +1,90 @@
+# k8s/backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travelsense-backend
+  namespace: travelsense
+  labels:
+    app: travelsense
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: travelsense
+      tier: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0          # zero-downtime deploys
+  template:
+    metadata:
+      labels:
+        app: travelsense
+        tier: backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/xentesito69/isi-travelsense/backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          env:
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: travelsense-secrets
+                  key: GOOGLE_CLIENT_ID
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: travelsense-secrets
+                  key: GEMINI_API_KEY
+            - name: DB_PATH
+              value: /app/data/travelsense.db
+          volumeMounts:
+            - name: db-storage
+              mountPath: /app/data
+          livenessProbe:
+            httpGet:
+              path: /api/v1/destinations
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/v1/destinations
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: travelsense-db-pvc
+---
+# k8s/backend-service.yaml  (incluido aquí para mantener el backend junto)
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: travelsense
+  labels:
+    app: travelsense
+    tier: backend
+spec:
+  selector:
+    app: travelsense
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP              # solo accesible dentro del cluster

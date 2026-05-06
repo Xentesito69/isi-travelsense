@@ -1,0 +1,13 @@
+# k8s/backend-pvc.yaml
+# PersistentVolumeClaim para la base de datos SQLite del backend
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: travelsense-db-pvc
+  namespace: travelsense
+spec:
+  accessModes:
+    - ReadWriteOnce        # SQLite es single-writer
+  resources:
+    requests:
+      storage: 1Gi

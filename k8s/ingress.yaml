@@ -1,0 +1,43 @@
+# k8s/ingress.yaml
+# Ingress: punto de entrada HTTP único al cluster.
+# Requiere un Ingress Controller instalado (ej: nginx-ingress o Traefik).
+# Instalación rápida con Helm:
+#   helm upgrade --install ingress-nginx ingress-nginx \
+#     --repo https://kubernetes.github.io/ingress-nginx \
+#     --namespace ingress-nginx --create-namespace
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: travelsense-ingress
+  namespace: travelsense
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Descomenta la siguiente línea si usas cert-manager para TLS automático:
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: travelsense.local      # cambia a tu dominio real en producción
+      http:
+        paths:
+          # Todo el tráfico /api/* va al backend
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 5000
+          # El resto va al frontend
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+  # Descomenta para TLS/HTTPS con cert-manager:
+  # tls:
+  #   - hosts:
+  #       - travelsense.local
+  #     secretName: travelsense-tls

@@ -1,3 +1,6 @@
+# Kubernetes secrets with real credentials (use secret.yaml only as template)
+# k8s/secret.yaml  ← descomenta si pones credenciales reales aquí
+
 # Environment variables (contain secrets)
 backend/.env
 .env

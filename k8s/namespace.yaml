@@ -1,0 +1,8 @@
+# k8s/namespace.yaml
+# Namespace propio para aislar todos los recursos de TravelSense
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: travelsense
+  labels:
+    app: travelsense
